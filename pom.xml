@@ -34,4 +34,10 @@
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:git://github.com/H0n0riuss/MapRGenericRepo.git</connection>
+        <developerConnection>scm:git:ssh://github.com:H0n0riuss/MapRGenericRepo.git</developerConnection>
+        <url>http://github.com/H0n0riuss/MapRGenericRepo/tree/main</url>
+    </scm>
+
 </project>
