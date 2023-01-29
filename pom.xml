@@ -25,4 +25,13 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Joscha Reichenberg</name>
+            <email>joscha.reichenberg@aboat-entertaining.com</email>
+            <organization>Not-jet</organization>
+            <organizationUrl>https://github.com/H0n0riuss/MapRGenericRepo</organizationUrl>
+        </developer>
+    </developers>
+
 </project>
