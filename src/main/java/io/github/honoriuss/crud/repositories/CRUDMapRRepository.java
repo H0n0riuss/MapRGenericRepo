@@ -10,16 +10,29 @@ import java.sql.Connection;
  */
 public class CRUDMapRRepository<T extends AEntity> {
     private Class<T> tClass;
-    private String dbPath;
+    private final String dbPath;
     private final Connection connection;
 
     public CRUDMapRRepository(Connection connection, String dbPath){
         this.connection = connection;
         this.dbPath = dbPath;
+
         tClass = getGenericClass();
     }
 
-    public T createEntry(T entry){
+    public T createEntry(T newEntry){
+        return null;
+    }
+
+    public T readEntry(String key){
+        return null;
+    }
+
+    public T updateEntry(T updatedEntry){
+        return null;
+    }
+
+    public T deleteEntry(String key){
         return null;
     }
 
