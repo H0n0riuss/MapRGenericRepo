@@ -1,9 +1,15 @@
 package io.github.honoriuss.crud.repositories;
 
 import io.github.honoriuss.crud.entities.AEntity;
+import org.ojai.Document;
 import org.ojai.store.Connection;
+import org.ojai.store.DocumentStore;
+import org.ojai.store.Query;
+import org.ojai.store.QueryResult;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author H0n0riuss
@@ -14,11 +20,28 @@ public class ExtendedCRUDRepository<T extends AEntity> extends CRUDMapRRepositor
     }
 
     public List<T> createMany(List<T> newEntries) {
-        return null;
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            for (T newEntry : newEntries) {
+                newEntry.set_id(UUID.randomUUID().toString());
+                Document doc = connection.newDocument(newEntry);
+                store.insert(doc);
+            }
+            return newEntries;
+        }
     }
 
-    public List<T> readMany(int amount, int offset, String order) {
-        return null;
+    public List<T> readMany(int limit, int offset, String orderBy, String order) {
+        List<T> resList = new ArrayList<>(limit);
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            Query query = connection.newQuery()
+                    .offset(offset)
+                    .limit(limit)
+                    .orderBy(orderBy, order)
+                    .build();
+            store.find(query);
+            //TODO
+        }
+        return resList;
     }
 
     public List<T> updateMany(List<T> updatedEntries) {

@@ -12,9 +12,9 @@ import java.util.UUID;
  * @author H0n0riuss
  */
 public class CRUDMapRRepository<T extends AEntity> {
-    private Class<T> tClass;
-    private final String dbPath;
-    private final Connection connection;
+    protected Class<T> tClass;
+    protected final String dbPath;
+    protected final Connection connection;
 
     public CRUDMapRRepository(Connection connection, String dbPath) {
         this.connection = connection;
