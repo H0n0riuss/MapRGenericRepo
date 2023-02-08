@@ -52,13 +52,13 @@
         </repository>
     </distributionManagement>
 
-    <!--<dependencies>
+    <dependencies>
         <dependency>
-            <groupId>com.mapr.ojai</groupId>
-            <artifactId>mapr-ojai-driver</artifactId>
-            <version>6.1.0-mapr</version>
+            <groupId>org.ojai</groupId>
+            <artifactId>ojai</artifactId>
+            <version>3.1.1-mapr</version>
         </dependency>
-    </dependencies>-->
+    </dependencies>
     <build>
         <plugins>
             <plugin>

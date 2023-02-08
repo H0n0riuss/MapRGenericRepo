@@ -1,8 +1,8 @@
 package io.github.honoriuss.crud.repositories;
 
 import io.github.honoriuss.crud.entities.AEntity;
+import org.ojai.store.Connection;
 
-import java.sql.Connection;
 import java.util.List;
 
 /**
