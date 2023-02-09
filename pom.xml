@@ -6,14 +6,14 @@
 
     <groupId>io.github.H0n0riuss</groupId>
     <artifactId>MapRGenericRepo</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>MapRGenericRepo</name>
     <description>A Repository to convenient manage MapRDB.</description>
     <url>https://github.com/H0n0riuss/MapRGenericRepo</url>
 
     <properties>
-        <java-version>17</java-version>
+        <java-version>12</java-version>
         <maven.compiler.source>${java-version}</maven.compiler.source>
         <maven.compiler.target>${java-version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
