@@ -2,10 +2,7 @@ package io.github.honoriuss.crud.repositories;
 
 import io.github.honoriuss.crud.entities.AEntity;
 import org.ojai.Document;
-import org.ojai.store.Connection;
-import org.ojai.store.DocumentStore;
-import org.ojai.store.Query;
-import org.ojai.store.QueryResult;
+import org.ojai.store.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,26 +35,43 @@ public class ExtendedCRUDRepository<T extends AEntity> extends CRUDMapRRepositor
                     .limit(limit)
                     .orderBy(orderBy, order)
                     .build();
-            store.find(query);
-            //TODO
+            var queryResult = store.find(query);
+            queryResult.forEach(entry -> resList.add(entry.toJavaBean(tClass)));
         }
         return resList;
     }
 
     public List<T> updateMany(List<T> updatedEntries) {
-        return null;
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            updatedEntries.forEach(entry -> {
+                var doc = connection.newDocument(entry);
+                store.insertOrReplace(doc);
+            });
+        }
+        return updatedEntries;
     }
 
-    public List<T> deleteMany(List<String> deleteKeys) {
-        return null;
+    public void deleteMany(List<String> deleteKeys) {
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            deleteKeys.forEach(store::delete);
+        }
     }
 
-    public T findEntry(String contains, String column) {
-        return null;
+    public List<T> findEntries(String contains, String column, int amount, int offset, String orderBy, String order) {
+        var resList = new ArrayList<T>(amount);
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            QueryCondition condition = connection.newCondition()
+                    .like(column, contains)
+                    .build();
+            Query query = connection.newQuery()
+                    .where(condition)
+                    .orderBy(orderBy, order)
+                    .offset(offset)
+                    .limit(amount)
+                    .build();
+            var queryResult = store.find(query);
+            queryResult.forEach(entry -> resList.add(entry.toJavaBean(tClass)));
+        }
+        return resList;
     }
-
-    public List<T> findMany(String contains, String column, int amount, int offset, String order) {
-        return null;
-    }
-
 }
