@@ -1,4 +1,4 @@
-package io.github.honoriuss.crud.entities;
+package io.github.honoriuss.mapr.entities;
 
 /**
  * @author H0n0riuss

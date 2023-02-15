@@ -1,6 +1,6 @@
-package io.github.honoriuss.crud.repositories;
+package io.github.honoriuss.mapr.repositories;
 
-import io.github.honoriuss.crud.entities.AEntity;
+import io.github.honoriuss.mapr.entities.AEntity;
 import org.ojai.Document;
 import org.ojai.store.*;
 
