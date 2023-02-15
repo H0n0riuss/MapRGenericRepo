@@ -13,9 +13,9 @@ import java.util.UUID;
  * @author H0n0riuss
  */
 public class CRUDMapRRepository<T extends AEntity> {
-    protected Class<T> tClass;
-    protected final String dbPath;
-    protected final Connection connection;
+    Class<T> tClass;
+    final String dbPath;
+    final Connection connection;
 
     public CRUDMapRRepository(Connection connection, String dbPath) {
         this.connection = connection;
