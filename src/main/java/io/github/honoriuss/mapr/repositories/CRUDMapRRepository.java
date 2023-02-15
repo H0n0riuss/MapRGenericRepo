@@ -26,6 +26,7 @@ public class CRUDMapRRepository<T extends AEntity> {
 
     /**
      * creates a new Entry
+     *
      * @param newEntry _id will be overwritten
      * @return the new Entry with _id from the db
      */
@@ -38,22 +39,39 @@ public class CRUDMapRRepository<T extends AEntity> {
         }
     }
 
+    /**
+     * reads a entry with the given id
+     *
+     * @param _id the id in the table
+     * @return the entry associated with the id or nothing
+     */
     public T readEntry(@NotNull String _id) {
         try (DocumentStore store = connection.getStore(dbPath)) {
             return store.findById(_id).toJavaBean(tClass);
         }
     }
 
+    /**
+     * updates the entry
+     *
+     * @param updatedEntry the new Entry Object
+     * @return the updated Entry with the same _id
+     */
     public T updateEntry(@NotNull T updatedEntry) {
-        try(DocumentStore store = connection.getStore(dbPath)){
+        try (DocumentStore store = connection.getStore(dbPath)) {
             Document doc = connection.newDocument(updatedEntry);
             store.insert(doc);
             return updatedEntry;
         }
     }
 
+    /**
+     * deletes entry, does nothing if key not exists
+     *
+     * @param _id the id in the table to delete
+     */
     public void deleteEntry(@NotNull String _id) {
-        try(DocumentStore store = connection.getStore(dbPath)){
+        try (DocumentStore store = connection.getStore(dbPath)) {
             store.delete(_id);
         }
     }
