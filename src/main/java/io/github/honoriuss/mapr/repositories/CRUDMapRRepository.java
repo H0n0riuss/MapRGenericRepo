@@ -5,6 +5,7 @@ import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.ParameterizedType;
 import java.util.UUID;
 
@@ -23,7 +24,12 @@ public class CRUDMapRRepository<T extends AEntity> {
         tClass = getGenericClass();
     }
 
-    public T createEntry(T newEntry) {
+    /**
+     * creates a new Entry
+     * @param newEntry _id will be overwritten
+     * @return the new Entry with _id from the db
+     */
+    public T createEntry(@NotNull T newEntry) {
         try (DocumentStore store = connection.getStore(dbPath)) {
             newEntry.set_id(UUID.randomUUID().toString());
             Document newDoc = connection.newDocument(newEntry);
@@ -32,13 +38,13 @@ public class CRUDMapRRepository<T extends AEntity> {
         }
     }
 
-    public T readEntry(String _id) {
+    public T readEntry(@NotNull String _id) {
         try (DocumentStore store = connection.getStore(dbPath)) {
             return store.findById(_id).toJavaBean(tClass);
         }
     }
 
-    public T updateEntry(T updatedEntry) {
+    public T updateEntry(@NotNull T updatedEntry) {
         try(DocumentStore store = connection.getStore(dbPath)){
             Document doc = connection.newDocument(updatedEntry);
             store.insert(doc);
@@ -46,7 +52,7 @@ public class CRUDMapRRepository<T extends AEntity> {
         }
     }
 
-    public void deleteEntry(String _id) {
+    public void deleteEntry(@NotNull String _id) {
         try(DocumentStore store = connection.getStore(dbPath)){
             store.delete(_id);
         }
