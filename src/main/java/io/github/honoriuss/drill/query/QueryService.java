@@ -1,6 +1,6 @@
 package io.github.honoriuss.drill.query;
 
-import io.github.honoriuss.drill.connection.DrillConnection;
+import io.github.honoriuss.drill.connections.DrillConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

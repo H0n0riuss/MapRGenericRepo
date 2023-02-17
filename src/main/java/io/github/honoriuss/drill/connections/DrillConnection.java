@@ -1,6 +1,6 @@
-package io.github.honoriuss.drill.connection;
+package io.github.honoriuss.drill.connections;
 
-import io.github.honoriuss.drill.connection.models.MapRConfig;
+import io.github.honoriuss.drill.connections.models.MapRConfig;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
