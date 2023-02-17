@@ -1,4 +1,4 @@
-package io.github.honoriuss.drill.query;
+package io.github.honoriuss.mapr.query;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

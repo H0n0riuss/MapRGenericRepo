@@ -1,4 +1,4 @@
-package io.github.honoriuss.drill.connections.models;
+package io.github.honoriuss.mapr.connections.models;
 
 public class MapRConfig {
     private String[] hosts;
