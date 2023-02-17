@@ -11,9 +11,17 @@ public class DrillResult {
     private final String[] columns;
     private final List<List<Object>> rows;
 
-    public DrillResult(ResultSet resultSet) throws SQLException{
+    public DrillResult(ResultSet resultSet) throws SQLException {
         this.columns = getColumns(resultSet);
         this.rows = getRows(resultSet);
+    }
+
+    public String[] getColumns() {
+        return columns;
+    }
+
+    public List<List<Object>> getRows() {
+        return rows;
     }
 
     private String[] getColumns(ResultSet resultSet) throws SQLException {
@@ -22,7 +30,7 @@ public class DrillResult {
         return IntStream.range(1, count + 1).mapToObj(idx -> {
             try {
                 return metaData.getColumnName(idx);
-            }catch(SQLException ex){
+            } catch (SQLException ex) {
                 ex.printStackTrace();
                 return null;
             }
@@ -33,11 +41,11 @@ public class DrillResult {
     private List<List<Object>> getRows(ResultSet resultSet) throws SQLException {
         var rows = new ArrayList<List<Object>>();
         var count = resultSet.getMetaData().getColumnCount();
-        while(resultSet.next()){
-            var row = IntStream.range(1, count + 1).mapToObj(idx ->{
+        while (resultSet.next()) {
+            var row = IntStream.range(1, count + 1).mapToObj(idx -> {
                 try {
                     return resultSet.getObject(idx);
-                }catch (SQLException ex){
+                } catch (SQLException ex) {
                     ex.printStackTrace();
                     return null;
                 }

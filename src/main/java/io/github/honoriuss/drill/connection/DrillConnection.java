@@ -31,7 +31,7 @@ public class DrillConnection {
         drillUrl = String.format(CONNECTION_STRING_PATTERN, conString, clusterName);
     }
 
-    private String buildConnectionString(String[] hosts, String port){
+    private String buildConnectionString(String[] hosts, String port) {
         return Arrays.stream(hosts)
                 .map(host -> host.concat(":").concat(port))
                 .collect(Collectors.joining(","));
