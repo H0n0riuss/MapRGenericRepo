@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.repositories;
 
-import io.github.honoriuss.mapr.entities.AEntity;
+import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;

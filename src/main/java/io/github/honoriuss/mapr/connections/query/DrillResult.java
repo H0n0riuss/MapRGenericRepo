@@ -1,4 +1,4 @@
-package io.github.honoriuss.mapr.query;
+package io.github.honoriuss.mapr.connections.query;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

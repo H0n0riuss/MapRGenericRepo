@@ -1,6 +1,6 @@
-package io.github.honoriuss.mapr.services;
+package io.github.honoriuss.mapr.repositories.services;
 
-import io.github.honoriuss.mapr.entities.AEntity;
+import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import io.github.honoriuss.mapr.repositories.CRUDMapRRepository;
 import org.ojai.store.Connection;
 
