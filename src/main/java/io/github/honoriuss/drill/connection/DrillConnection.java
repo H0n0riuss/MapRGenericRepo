@@ -1,21 +1,39 @@
 package io.github.honoriuss.drill.connection;
 
+import io.github.honoriuss.drill.connection.models.MapRConfig;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class DrillConnection {
-    private static String connectionString = "jdbc:drill:zk=%s:%s/drill/%s";
-
+    private static final String JDBC_DRIVER = "org.apache.drill.jdbc.Driver";
+    private static final String CONNECTION_STRING_PATTERN = "jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl";
     private static Connection connection;
 
-    public static Connection getConnection() throws SQLException {
-        if (connection == null)
-            connection = DriverManager.getConnection(connectionString);
+    private static String drillUrl;
+
+    public static Connection getConnection() {
         return connection;
     }
 
-    public DrillConnection(String node, String port, String host) {
-        connectionString = String.format(connectionString, node, port, host);
+    public DrillConnection(MapRConfig mapRConfig) throws ClassNotFoundException, SQLException {
+        this(mapRConfig.getHosts(), mapRConfig.getPort(), mapRConfig.getClusterName());
+    }
+
+    public DrillConnection(String[] hosts, String port, String clusterName) throws ClassNotFoundException, SQLException {
+        Class.forName(JDBC_DRIVER);
+        connection = DriverManager.getConnection(drillUrl);
+
+        var conString = buildConnectionString(hosts, port);
+        drillUrl = String.format(CONNECTION_STRING_PATTERN, conString, clusterName);
+    }
+
+    private String buildConnectionString(String[] hosts, String port){
+        return Arrays.stream(hosts)
+                .map(host -> host.concat(":").concat(port))
+                .collect(Collectors.joining(","));
     }
 }
