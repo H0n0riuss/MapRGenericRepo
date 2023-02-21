@@ -74,4 +74,24 @@ public class ExtendedCRUDRepository<T extends AEntity> extends CRUDMapRRepositor
         }
         return resList;
     }
+
+    public List<T> findEntries(String contains, List<String> columns, int amount, int offset, String orderBy, String order) {
+        var resList = new ArrayList<T>(amount);
+        try (DocumentStore store = connection.getStore(dbPath)) {
+            QueryCondition condition = connection.newCondition();
+            for (var column : columns) {
+                condition = condition.like(column, contains);
+            }
+            condition = condition.build();
+            Query query = connection.newQuery()
+                    .where(condition)
+                    .orderBy(orderBy, order)
+                    .offset(offset)
+                    .limit(amount)
+                    .build();
+            var queryResult = store.find(query);
+            queryResult.forEach(entry -> resList.add(entry.toJavaBean(tClass)));
+        }
+        return resList;
+    }
 }
