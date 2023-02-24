@@ -11,8 +11,8 @@ import java.util.UUID;
 /**
  * @author H0n0riuss
  */
-public class ExtendedCRUDRepository<T extends AEntity> extends CRUDMapRRepository<T> {
-    public ExtendedCRUDRepository(Connection connection, String dbPath, Class<T> tClass) {
+public class ExtendedCRUDMapRRepository<T extends AEntity> extends CRUDMapRRepository<T> {
+    public ExtendedCRUDMapRRepository(Connection connection, String dbPath, Class<T> tClass) {
         super(connection, dbPath, tClass);
     }
 
