@@ -7,8 +7,8 @@ import org.ojai.store.Connection;
 public abstract class ACRUDMapRService<T extends AEntity> {
     private final CRUDMapRRepository<T> repository;
 
-    public ACRUDMapRService(Connection connection, String tablePath) {
-        repository = new CRUDMapRRepository<>(connection, tablePath);
+    public ACRUDMapRService(Connection connection, String tablePath, Class<T> tClass) {
+        repository = new CRUDMapRRepository<>(connection, tablePath, tClass);
     }
 
     /**

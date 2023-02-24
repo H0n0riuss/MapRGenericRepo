@@ -13,15 +13,14 @@ import java.util.UUID;
  * @author H0n0riuss
  */
 public class CRUDMapRRepository<T extends AEntity> {
-    Class<T> tClass;
+    final Class<T> tClass;
     final String dbPath;
     final Connection connection;
 
-    public CRUDMapRRepository(Connection connection, String dbPath) {
+    public CRUDMapRRepository(Connection connection, String dbPath, Class<T> tClass) {
         this.connection = connection;
         this.dbPath = dbPath;
-
-        tClass = getGenericClass();
+        this.tClass = tClass;
     }
 
     /**
@@ -74,10 +73,5 @@ public class CRUDMapRRepository<T extends AEntity> {
         try (DocumentStore store = connection.getStore(dbPath)) {
             store.delete(_id);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Class<T> getGenericClass() {
-        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }
