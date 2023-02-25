@@ -16,9 +16,9 @@ public class MapRFSAdapter {
         return getFs().open(new Path(filePath));
     }
 
-    public List<String> listFiles(String filePath, boolean recursiv) throws IOException {
+    public List<String> listFiles(String filePath, boolean recursive) throws IOException {
         var files = new ArrayList<String>();
-        RemoteIterator<LocatedFileStatus> iterator = getFs().listFiles(new Path(filePath), recursiv);
+        RemoteIterator<LocatedFileStatus> iterator = getFs().listFiles(new Path(filePath), recursive);
         while (iterator.hasNext()) {
             var file = iterator.next();
             if (file.isFile()) {

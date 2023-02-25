@@ -1,5 +1,7 @@
 package io.github.honoriuss.mapr.connections.query;
 
+import io.github.honoriuss.mapr.utils.Assert;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ public class DrillResult {
     private final List<List<Object>> rows;
 
     public DrillResult(ResultSet resultSet) throws SQLException {
+        Assert.notNull(resultSet, "ResultSet must not be null");
+
         this.columns = getColumns(resultSet);
         this.rows = getRows(resultSet);
     }
