@@ -6,7 +6,7 @@
 
     <groupId>io.github.H0n0riuss</groupId>
     <artifactId>MapRGenericRepo</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 
     <name>MapRGenericRepo</name>
     <description>A Repository to convenient manage MapRDB.</description>
