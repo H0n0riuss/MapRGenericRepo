@@ -4,11 +4,18 @@ public class MapRConfig {
     private String[] hosts;
     private String clusterName;
     private String port;
+    private String driver;
+    private String connectionPattern;
 
-    public MapRConfig(String[] hosts, String clusterName, String port) {
+    public MapRConfig(String[] hosts, String clusterName, String port, String driver, String connectionPattern) {
         this.hosts = hosts;
         this.clusterName = clusterName;
         this.port = port;
+        this.driver = driver;
+        this.connectionPattern = connectionPattern;
+    }
+
+    public MapRConfig(){
     }
 
     public String[] getHosts() {
@@ -33,6 +40,22 @@ public class MapRConfig {
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public String getConnectionPattern() {
+        return connectionPattern;
+    }
+
+    public void setConnectionPattern(String connectionPattern) {
+        this.connectionPattern = connectionPattern;
     }
 
 }

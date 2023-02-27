@@ -32,4 +32,8 @@ public abstract class StringUtils {
             }
         }
     }
+    @Nullable
+    public static boolean hasText(String str){
+        return str != null && !str.equals("");
+    }
 }
