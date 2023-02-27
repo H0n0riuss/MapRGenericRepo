@@ -8,18 +8,28 @@ import java.io.IOException;
 /**
  * @author H0n0riuss
  */
-public class MapRUtils {
+public abstract class MapRUtils {
 
     /**
      * creates the path with all subdirectories, if they don`t exist
+     *
      * @param fullPath should not contain the table name
      * @return true if creation succeeds or already exists
      */
-    public boolean createDirectoryPath(String fullPath) throws IOException {
+    public static boolean createDirectoryPath(String fullPath) throws IOException {
         var fs = MapRFSAdapter.getFs();
         var dirPath = new Path(fullPath);
         if(fs.exists(dirPath))
             return true;
         return fs.mkdirs(dirPath);
+    }
+
+    /**
+     *
+     * @param tableFullPath
+     * @return
+     */
+    public static boolean createTable(String tableFullPath) {
+        return false;
     }
 }

@@ -29,6 +29,9 @@ public class DrillConnection {
                 mapRConfig.getConnectionPattern());
     }
 
+    public DrillConnection(){
+    }
+
     public DrillConnection(String[] hosts, String port, String clusterName, String driver, String connectionPattern)
             throws ClassNotFoundException, SQLException {
         var conString = buildConnectionString(hosts, port);
