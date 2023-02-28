@@ -12,15 +12,26 @@ import java.util.List;
 import java.util.Map;
 
 public class QueryService {
+
+    private DrillConnection connection;
+
+    public DrillConnection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(DrillConnection connection) {
+        this.connection = connection;
+    }
+
     public ResultSet ExecuteQuery(String query) throws SQLException {
-        Statement st = DrillConnection.getConnection().createStatement();
+        Statement st = connection.getConnection().createStatement();
         return st.executeQuery(query);
     }
 
     public DrillResult getQueryResult(String query) throws SQLException {
         DrillResult result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillConnection = DrillConnection.getConnection()) {
+        try (Connection drillConnection = connection.getConnection()) {
             for (var distinctQuery : distinctQueries) {
                 try (var statement = drillConnection.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {
@@ -35,7 +46,7 @@ public class QueryService {
     public List<Map<String, Object>> getQueryResultJson(String query) throws SQLException {
         List<Map<String, Object>> result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillConnection = DrillConnection.getConnection()) {
+        try (Connection drillConnection = connection.getConnection()) {
             for (var distinctQuery : distinctQueries) {
                 try (var statement = drillConnection.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {
