@@ -1,11 +1,11 @@
 package io.github.honoriuss.mapr.connections.models;
 
 public class MapRConfig {
-    public String[] hosts;
-    public String clusterName;
-    public String port;
-    public String driver;
-    public String connectionPattern;
+    private String[] hosts;
+    private String clusterName;
+    private String port;
+    private String driver;
+    private String connectionPattern;
 
     public MapRConfig(String[] hosts, String clusterName, String port, String driver, String connectionPattern) {
         this.hosts = hosts;

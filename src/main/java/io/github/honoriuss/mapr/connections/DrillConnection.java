@@ -16,12 +16,17 @@ public class DrillConnection {
             "com.mapr.drill.jdbc41.Driver"
     };
     private static final String CONNECTION_STRING_PATTERN = "jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl";
+
     private Connection connection;
 
     private static String drillUrl;
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     public DrillConnection(MapRConfig mapRConfig) throws ClassNotFoundException, SQLException {
