@@ -17,11 +17,11 @@ public class DrillConnection {
     };
     private static final String CONNECTION_STRING_PATTERN = "jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl";
 
-    private Connection connection;
+    private static Connection connection;
 
     private static String drillUrl;
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         return connection;
     }
 

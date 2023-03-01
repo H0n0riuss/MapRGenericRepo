@@ -1,10 +1,12 @@
 package io.github.honoriuss.mapr.repositories;
 
+import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.lang.reflect.ParameterizedType;
 import java.util.UUID;
@@ -16,6 +18,10 @@ public class CRUDMapRRepository<T extends AEntity> {
     final Class<T> tClass;
     final String dbPath;
     final Connection connection;
+
+    public CRUDMapRRepository(String dbPath, Class<T> tClass) {
+        this(OjaiConnector.getConnection(), dbPath, tClass);
+    }
 
     public CRUDMapRRepository(Connection connection, String dbPath, Class<T> tClass) {
         this.connection = connection;

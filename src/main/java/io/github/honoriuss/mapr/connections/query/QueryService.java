@@ -13,9 +13,9 @@ import java.util.Map;
 
 public class QueryService {
 
-    private DrillConnection connection;
+    private static DrillConnection connection;
 
-    public DrillConnection getConnection() {
+    public static DrillConnection getConnection() {
         return connection;
     }
 
