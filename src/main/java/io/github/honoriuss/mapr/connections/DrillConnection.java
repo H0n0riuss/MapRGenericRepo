@@ -26,7 +26,7 @@ public class DrillConnection {
     }
 
     public void setConnection(Connection connection) {
-        this.connection = connection;
+        DrillConnection.connection = connection;
     }
 
     public DrillConnection(MapRConfig mapRConfig) throws ClassNotFoundException, SQLException {
