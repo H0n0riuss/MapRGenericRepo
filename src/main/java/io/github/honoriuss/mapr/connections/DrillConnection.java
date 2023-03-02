@@ -34,7 +34,7 @@ public class DrillConnection {
                 mapRConfig.getConnectionPattern());
     }
 
-    public DrillConnection(){
+    public DrillConnection() {
     }
 
     public DrillConnection(String[] hosts, String port, String clusterName, String driver, String connectionPattern)
@@ -62,6 +62,7 @@ public class DrillConnection {
             try {
                 Class.forName(driver);
                 connection = DriverManager.getConnection(drillUrl);
+                break;
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
