@@ -6,7 +6,7 @@
 
     <groupId>io.github.H0n0riuss</groupId>
     <artifactId>MapRGenericRepo</artifactId>
-    <version>0.1.9</version>
+    <version>0.2.1</version>
 
     <name>MapRGenericRepo</name>
     <description>A Repository to convenient manage MapRDB.</description>
@@ -14,9 +14,11 @@
 
     <properties>
         <java-version>11</java-version>
-        <maven.compiler.source>${java-version}</maven.compiler.source>
-        <maven.compiler.target>${java-version}</maven.compiler.target>
+        <java-maven-compilation-version>11</java-maven-compilation-version>
+        <maven.compiler.source>${java-maven-compilation-version}</maven.compiler.source>
+        <maven.compiler.target>${java-maven-compilation-version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <auto-service.version>1.1.1</auto-service.version>
     </properties>
 
     <licenses>
@@ -63,13 +65,19 @@
             <artifactId>drill-jdbc-all</artifactId>
             <version>1.20.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>${auto-service.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -109,17 +117,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.7.1</version>
+                <version>4.0.0-M7</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.4.3</version>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -127,7 +135,16 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${java-maven-compilation-version}</source>
+                    <target>${java-maven-compilation-version}</target>
+                    <compilerArgument>-proc:none</compilerArgument>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
 </project>
