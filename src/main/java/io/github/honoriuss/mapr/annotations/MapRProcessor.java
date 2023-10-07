@@ -46,6 +46,8 @@ public class MapRProcessor extends AbstractProcessor {
 
         StringBuilder generatedCode = new StringBuilder();
         generatedCode.append("package ").append(packageName).append(";\n\n");
+        generatedCode.append("import org.springframework.stereotype.Component;\n");
+        generatedCode.append("@Component\n");
         generatedCode.append("public class ").append(generatedClassName).append(" implements ")
                 .append(interfaceElement.getSimpleName()).append(" {\n\n");
 
