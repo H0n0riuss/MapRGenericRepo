@@ -1,6 +1,7 @@
-package io.github.honoriuss.mapr.annotations;
+package io.github.honoriuss.mapr.query;
 
 import com.google.auto.service.AutoService;
+import io.github.honoriuss.mapr.query.annotations.Repository;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;

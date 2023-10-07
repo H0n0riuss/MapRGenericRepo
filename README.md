@@ -13,7 +13,7 @@ public class YourEntity extends AEntity {
 ```
 
 ```java
-import io.github.honoriuss.mapr.annotations.Repository;
+import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.repositories.CRUDMapRRepository;
 
 @Repository
