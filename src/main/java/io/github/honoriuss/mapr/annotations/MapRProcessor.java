@@ -27,59 +27,36 @@ public class MapRProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Repository.class)) {
-            System.out.println("MapRProcessor...");
             if (element.getKind() == ElementKind.INTERFACE) {
                 generateImplementation((TypeElement) element);
             } else {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-                        "Only interfaces can be annotated with @ExceptionInterfaceAnnotation", element);
+                        "Only interfaces can be annotated with @Repository", element);
             }
         }
         return true;
     }
 
     private void generateImplementation(TypeElement interfaceElement) {
-// Hier kannst du den generierten Code erstellen und schreiben
-        // In diesem Beispiel generieren wir einfach eine einfache Klasse
         String generatedClassName = interfaceElement.getSimpleName() + "Impl";
         String packageName = processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
 
         StringBuilder generatedCode = new StringBuilder();
-        generatedCode.append("package ").append(packageName).append(";\n\n");
-        generatedCode.append("import org.springframework.stereotype.Component;\n");
-        generatedCode.append("@Component\n");
-        generatedCode.append("public class ").append(generatedClassName).append(" implements ")
-                .append(interfaceElement.getSimpleName()).append(" {\n\n");
+        implementHead(interfaceElement, generatedClassName, packageName, generatedCode);
 
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                ExecutableElement methodElement = (ExecutableElement) enclosedElement;
-                generatedCode.append("    @Override\n");
-                generatedCode.append("    public ").append(methodElement.getReturnType()).append(" ")
-                        .append(methodElement.getSimpleName()).append("(");
-
-                // Füge Parameter hinzu
-                boolean firstParam = true;
-                for (Element paramElement : methodElement.getParameters()) {
-                    if (!firstParam) {
-                        generatedCode.append(", ");
-                    }
-                    generatedCode.append(paramElement.asType()).append(" ").append(paramElement.getSimpleName());
-                    firstParam = false;
-                }
-
-                generatedCode.append(") {\n");
-                generatedCode.append("        System.out.println(\"Method ").append(methodElement.getSimpleName())
-                        .append(" is called.\");\n");
-                generatedCode.append("        // Deine Implementierung hier\n");
-                generatedCode.append("    }\n\n");
+                generateMethods(generatedCode, (ExecutableElement) enclosedElement);
             }
         }
 
         generatedCode.append("}\n");
 
-        // Schreibe den generierten Code in eine Datei
+        writeImplementedClass(interfaceElement, generatedClassName, packageName, generatedCode);
+    }
+
+    private void writeImplementedClass(TypeElement interfaceElement, String generatedClassName, String packageName, StringBuilder generatedCode) {
         try {
             JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(packageName + "." + generatedClassName, interfaceElement);
             try (Writer writer = sourceFile.openWriter()) {
@@ -88,5 +65,42 @@ public class MapRProcessor extends AbstractProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void implementHead(TypeElement interfaceElement, String generatedClassName, String packageName, StringBuilder generatedCode) {
+        generatedCode.append("package ")
+                .append(packageName)
+                .append(";\n\n");
+        generatedCode.append("import org.springframework.stereotype.Component;\n");
+        generatedCode.append("@Component\n");
+        generatedCode.append("public class ")
+                .append(generatedClassName)
+                .append(" implements ")
+                .append(interfaceElement.getSimpleName())
+                .append(" {\n\n");
+    }
+
+    private void generateMethods(StringBuilder generatedCode, ExecutableElement enclosedElement) {
+        generatedCode.append("    @Override\n");
+        generatedCode.append("    public ")
+                .append(enclosedElement.getReturnType())
+                .append(" ")
+                .append(enclosedElement.getSimpleName())
+                .append("(");
+
+        boolean firstParam = true;
+        for (Element paramElement : enclosedElement.getParameters()) {
+            if (!firstParam) {
+                generatedCode.append(", ");
+            }
+            generatedCode.append(paramElement.asType()).append(" ").append(paramElement.getSimpleName());
+            firstParam = false;
+        }
+
+        generatedCode.append(") {\n");
+        generatedCode.append("        System.out.println(\"Method ").append(enclosedElement.getSimpleName())
+                .append(" is called.\");\n");
+        generatedCode.append("        // Deine Implementierung hier\n");
+        generatedCode.append("    }\n\n");
     }
 }

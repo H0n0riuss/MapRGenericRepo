@@ -6,9 +6,7 @@ import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.lang.reflect.ParameterizedType;
 import java.util.UUID;
 
 /**
@@ -45,7 +43,7 @@ public class CRUDMapRRepository<T extends AEntity> {
     }
 
     /**
-     * reads a entry with the given id
+     * reads an entry with the given id
      *
      * @param _id the id in the table
      * @return the entry associated with the id or nothing
