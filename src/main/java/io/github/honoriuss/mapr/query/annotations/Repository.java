@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Repository {
-    Class<AEntity> clazz();
+    Class<? extends AEntity> clazz();
     String tablePath() default "";
 }
