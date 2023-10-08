@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * @author H0n0riuss
  */
-@SupportedAnnotationTypes("io.github.honoriuss.mapr.annotations.*")
+@SupportedAnnotationTypes("io.github.honoriuss.mapr.query.annotations.*")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {
@@ -48,7 +48,7 @@ public class MapRProcessor extends AbstractProcessor {
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                generateMethods(generatedCode, (ExecutableElement) enclosedElement);
+                generateMethod(generatedCode, (ExecutableElement) enclosedElement);
             }
         }
 
@@ -72,7 +72,7 @@ public class MapRProcessor extends AbstractProcessor {
         generatedCode.append("package ")
                 .append(packageName)
                 .append(";\n\n");
-        generatedCode.append("import org.springframework.stereotype.Component;\n");
+        generatedCode.append("import org.springframework.stereotype.Component;\n"); //TODO add imports for class
         generatedCode.append("@Component\n");
         generatedCode.append("public class ")
                 .append(generatedClassName)
@@ -81,7 +81,7 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(" {\n\n");
     }
 
-    private void generateMethods(StringBuilder generatedCode, ExecutableElement enclosedElement) {
+    private void generateMethod(StringBuilder generatedCode, ExecutableElement enclosedElement) {
         generatedCode.append("    @Override\n");
         generatedCode.append("    public ")
                 .append(enclosedElement.getReturnType())
