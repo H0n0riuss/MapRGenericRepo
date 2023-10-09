@@ -8,14 +8,12 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,6 +42,7 @@ public class MapRProcessor extends AbstractProcessor {
 
         StringBuilder generatedCode = new StringBuilder();
         implementHead(interfaceElement, generatedClassName, packageName, generatedCode);
+        implementAttributes(interfaceElement, generatedCode);
 
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
@@ -81,6 +80,16 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(" {\n\n");
     }
 
+    private void implementAttributes(TypeElement interfaceElement, StringBuilder generatedCode) {
+        List<? extends VariableElement> parameters = ((ExecutableElement) interfaceElement).getParameters();
+        for (VariableElement parameter : parameters) {
+            String parameterType = parameter.asType().toString();
+            String parameterName = parameter.getSimpleName().toString();
+            generatedCode.append("    final ").append(parameterType).append(parameterName).append(";\n");
+            //TODO hier weiter machen
+        }
+    }
+
     private void generateMethod(StringBuilder generatedCode, ExecutableElement enclosedElement) {
         generatedCode.append("    @Override\n");
         generatedCode.append("    public ")
@@ -101,7 +110,17 @@ public class MapRProcessor extends AbstractProcessor {
         generatedCode.append(") {\n");
         generatedCode.append("        System.out.println(\"Method ").append(enclosedElement.getSimpleName())
                 .append(" is called.\");\n");
-        generatedCode.append("        // Deine Implementierung hier\n");
+        if (!enclosedElement.getReturnType().toString().equals("void")) {
+            generatedCode.append(createReturnMethod(enclosedElement));
+        }
         generatedCode.append("    }\n\n");
+    }
+
+    private String createReturnMethod(ExecutableElement enclosedElement) {
+        var appendCode =
+                "        try (DocumentStore store = connection.getStore(dbPath)) {\n" +
+                "            return store.findById(_id).toJavaBean(clazz);\n" +
+                "        }\n";
+        return appendCode;
     }
 }
