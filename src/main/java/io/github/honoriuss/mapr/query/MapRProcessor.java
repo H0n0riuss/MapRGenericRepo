@@ -72,6 +72,9 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(packageName)
                 .append(";\n\n");
         generatedCode.append("import org.springframework.stereotype.Component;\n"); //TODO add imports for class
+        generatedCode.append("import io.github.honoriuss.mapr.query.parser.QueryCreator;");
+        generatedCode.append("import org.ojai.Document;\n")
+                .append("import org.ojai.store.*;\n\n");
         generatedCode.append("@Component\n");
         generatedCode.append("public class ")
                 .append(generatedClassName)
@@ -108,19 +111,25 @@ public class MapRProcessor extends AbstractProcessor {
         }
 
         generatedCode.append(") {\n");
-        generatedCode.append("        System.out.println(\"Method ").append(enclosedElement.getSimpleName())
-                .append(" is called.\");\n");
+        generatedCode.append("        try (DocumentStore store = connection.getStore(dbPath)) {\n");
         if (!enclosedElement.getReturnType().toString().equals("void")) {
-            generatedCode.append(createReturnMethod(enclosedElement));
+            createReturnMethod(generatedCode, enclosedElement);
         }
+        generatedCode.append("        }\n");
         generatedCode.append("    }\n\n");
     }
 
-    private String createReturnMethod(ExecutableElement enclosedElement) {
-        var appendCode =
-                "        try (DocumentStore store = connection.getStore(dbPath)) {\n" +
-                "            return store.findById(_id).toJavaBean(clazz);\n" +
-                "        }\n";
-        return appendCode;
+    private void createReturnMethod(StringBuilder generatedCode, ExecutableElement enclosedElement) {
+        generatedCode
+                .append("            QueryCondition condition = connection.newCondition();\n")
+                .append("            var columns = QueryCreator.createCondition(\"findByTitleContains\"")
+                //.append(enclosedElement.getSimpleName().toString())
+                .append("            );\n")
+                .append("            for (var column : columns) {\n")
+                .append("                condition = condition.like(column, \"test\");")
+                //.append(enclosedElement.getParameters()) //TODO das ganze in Schleifen packen
+                .append("            }")
+                .append("            Query query = connection.newQuery().where(condition).build();\n")
+                .append("            return store.find(query).toJavaBean(clazz);\n");
     }
 }

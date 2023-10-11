@@ -9,11 +9,9 @@ public class QueryCreator {
 
     private PartTree tree;
 
-    public String createQuery(String inputQuery) {
-        Assert.hasText(inputQuery, "InputQuery must not be null");
-        var query = "";
-
-        return query;
+    public static String[] createCondition(String methodName) {
+        Assert.hasText(methodName, "MethodName must not be null");
+        return methodName.split("By")[1].split("(?=[A-Z])");
     }
 
     private String extractParts(String inputQuery){

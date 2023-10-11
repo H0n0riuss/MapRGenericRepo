@@ -29,11 +29,16 @@ public class PartTree {
 
 
     private static class Subject {
-        private final Pattern LIMITED_QUERY_TEMPLATE = Pattern.compile("^(find|read|get|query|search|stream)(Distinct)?(First|Top)(\\d*)?(\\p{Lu}.*?)??By");
+        //private final Pattern LIMITED_QUERY_TEMPLATE = Pattern.compile("^(find|read|get|query|search|stream)(Distinct)?(First|Top)(\\d*)?(\\p{Lu}.*?)??By");
 
         public Subject(Optional<String> subject) {
 
         }
 
+        private boolean matches(Optional<String> subject, Pattern pattern) {
+            return (Boolean)subject.map((it) -> {
+                return pattern.matcher(it).find();
+            }).orElse(false);
+        }
     }
 }
