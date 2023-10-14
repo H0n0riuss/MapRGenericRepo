@@ -8,13 +8,14 @@
     <artifactId>MapRGenericRepo</artifactId>
     <version>0.2.1</version>
 
+
     <name>MapRGenericRepo</name>
     <description>A Repository to convenient manage MapRDB.</description>
     <url>https://github.com/H0n0riuss/MapRGenericRepo</url>
 
     <properties>
-        <java-version>11</java-version>
-        <java-maven-compilation-version>11</java-maven-compilation-version>
+        <java-version>17</java-version>
+        <java-maven-compilation-version>17</java-maven-compilation-version>
         <maven.compiler.source>${java-maven-compilation-version}</maven.compiler.source>
         <maven.compiler.target>${java-maven-compilation-version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,12 +59,12 @@
         <dependency>
             <groupId>org.ojai</groupId>
             <artifactId>ojai</artifactId>
-            <version>3.1.1-mapr</version>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.drill.exec</groupId>
             <artifactId>drill-jdbc-all</artifactId>
-            <version>1.20.2</version>
+            <version>1.21.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>

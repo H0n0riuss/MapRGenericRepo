@@ -6,8 +6,6 @@ import io.github.honoriuss.mapr.query.annotations.Repository;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -20,7 +18,6 @@ import java.util.Set;
  * @author H0n0riuss
  */
 @SupportedAnnotationTypes("io.github.honoriuss.mapr.query.annotations.*")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {
     @Override
@@ -42,12 +39,12 @@ public class MapRProcessor extends AbstractProcessor {
 
         StringBuilder generatedCode = new StringBuilder();
         implementHead(interfaceElement, generatedClassName, packageName, generatedCode);
-        implementAttributes(interfaceElement, generatedCode);
+        //implementAttributes((ExecutableElement) interfaceElement, generatedCode);
 
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                generateMethod(generatedCode, (ExecutableElement) enclosedElement);
+                generateMethods(generatedCode, (ExecutableElement) enclosedElement);
             }
         }
 
@@ -71,9 +68,10 @@ public class MapRProcessor extends AbstractProcessor {
         generatedCode.append("package ")
                 .append(packageName)
                 .append(";\n\n");
-        generatedCode.append("import org.springframework.stereotype.Component;\n"); //TODO add imports for class
-        generatedCode.append("import io.github.honoriuss.mapr.query.parser.QueryCreator;");
-        generatedCode.append("import org.ojai.Document;\n")
+        generatedCode
+                .append("import org.springframework.stereotype.Component;\n") //TODO add imports for class
+                .append("import io.github.honoriuss.mapr.query.parser.QueryCreator;\n")
+                .append("import org.ojai.Document;\n")
                 .append("import org.ojai.store.*;\n\n");
         generatedCode.append("@Component\n");
         generatedCode.append("public class ")
@@ -83,17 +81,17 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(" {\n\n");
     }
 
-    private void implementAttributes(TypeElement interfaceElement, StringBuilder generatedCode) {
-        List<? extends VariableElement> parameters = ((ExecutableElement) interfaceElement).getParameters();
+    private void implementAttributes(ExecutableElement interfaceElement, StringBuilder generatedCode) {
+        List<? extends VariableElement> parameters = interfaceElement.getParameters(); //TODO das mag der nicht
         for (VariableElement parameter : parameters) {
             String parameterType = parameter.asType().toString();
             String parameterName = parameter.getSimpleName().toString();
-            generatedCode.append("    final ").append(parameterType).append(parameterName).append(";\n");
+            //generatedCode.append("    ").append(parameterType).append(parameterName).append(";\n");
             //TODO hier weiter machen
         }
     }
 
-    private void generateMethod(StringBuilder generatedCode, ExecutableElement enclosedElement) {
+    private void generateMethods(StringBuilder generatedCode, ExecutableElement enclosedElement) {
         generatedCode.append("    @Override\n");
         generatedCode.append("    public ")
                 .append(enclosedElement.getReturnType())
@@ -123,11 +121,11 @@ public class MapRProcessor extends AbstractProcessor {
         generatedCode
                 .append("            QueryCondition condition = connection.newCondition();\n")
                 .append("            var columns = QueryCreator.createCondition(\"findByTitleContains\"")
-                //.append(enclosedElement.getSimpleName().toString())
+                .append(enclosedElement.getSimpleName().toString())
                 .append("            );\n")
                 .append("            for (var column : columns) {\n")
                 .append("                condition = condition.like(column, \"test\");")
-                //.append(enclosedElement.getParameters()) //TODO das ganze in Schleifen packen
+                .append(enclosedElement.getParameters()) //TODO das ganze in Schleifen packen
                 .append("            }")
                 .append("            Query query = connection.newQuery().where(condition).build();\n")
                 .append("            return store.find(query).toJavaBean(clazz);\n");
