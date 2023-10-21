@@ -4,15 +4,14 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
+import org.ojai.store.Connection;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Set;
 
 /**
@@ -45,10 +44,7 @@ public class MapRProcessor extends AbstractProcessor {
         implementAttributes();
         implementConstructor();
         implementMethods();
-
-        generatedCode.append("}\n");
-
-        writeImplementedClass_old(metaInformation.generatedClassName, metaInformation.packageName);
+        writeImplementedClass();
     }
 
     private void implementMethods() {
@@ -60,74 +56,31 @@ public class MapRProcessor extends AbstractProcessor {
         }
     }
 
-    private void writeImplementedClass_old(String generatedClassName, String packageName) {
-        try {
-            JavaFileObject sourceFile = processingEnv.getFiler()
-                    .createSourceFile(packageName + "." + generatedClassName, interfaceElement);
-            try (Writer writer = sourceFile.openWriter()) {
-                writer.write(generatedCode.toString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void implementHead() {
-        generatedCode.append("package ")
-                .append(metaInformation.packageName)
-                .append(";\n\n");
-        generatedCode
-                .append("import org.springframework.stereotype.Component;\n") //TODO add imports for class
-                .append("import io.github.honoriuss.mapr.query.parser.QueryCreator;\n")
-                .append("import io.github.honoriuss.mapr.connections.OjaiConnector;\n")
-                .append("import org.ojai.Document;\n")
-                .append("import org.ojai.store.*;\n\n");
-        generatedCode.append("@Component\n");
-        generatedCode.append("public class ")
-                .append(metaInformation.generatedClassName)
-                .append(" implements ")
-                .append(interfaceElement.getSimpleName())
-                .append(" {\n\n");
+        classBuilder
+                .addAnnotation(Component.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(TypeName.get(interfaceElement.asType()));
     }
 
     private void implementAttributes() {
-        generatedCode
-                .append("    private final Connection connection;\n");
-
         Repository repositoryAnnotation = interfaceElement.getAnnotation(Repository.class);
-        try {
-            classBuilder
-                    .addModifiers(Modifier.PUBLIC)
-                    .addSuperinterface(TypeName.get(interfaceElement.asType()))
-                    .addField(FieldSpec.builder(metaInformation.entityClassName, "entity", Modifier.PRIVATE).build())
-                    .addMethod(MethodSpec.methodBuilder("save")
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(void.class)
-                            .addParameter(metaInformation.entityClassName, "entity")
-                            .addStatement("this.entity = entity")
-                            .build());
-            JavaFile javaFile = JavaFile.builder(metaInformation.packageName, classBuilder.build())
-                    .build();
-            javaFile.writeTo(processingEnv.getFiler());
-        } catch (Exception ex) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, ex.getMessage());
-        }
-
-        String path = repositoryAnnotation.tablePath();
-        generatedCode
-                .append("    private final String dbPath = \"")
-                .append(path)
-                .append("\";\n");
+        classBuilder
+                .addField(FieldSpec
+                        .builder(Connection.class, "connection", Modifier.PRIVATE, Modifier.FINAL)
+                        .build())
+                .addField(FieldSpec
+                        .builder(String.class, "dbPath", Modifier.PRIVATE, Modifier.FINAL)
+                        .initializer(String.format("\"%s\"", repositoryAnnotation.tablePath()))
+                        .build());
     }
 
     private void implementConstructor() {
-        generatedCode
-                .append("    public ")
-                .append(interfaceElement.getSimpleName())
-                .append("Impl") //TODO alles auslagern was Namen hat
-                .append("(Connection connection) {\n")
-                .append("        this.connection = connection;\n")
-                .append("    }\n\n");
+        classBuilder.addMethod(MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(Connection.class, "connection")
+                .addStatement("this.connection = connection")
+                .build());
     }
 
     private void generateMethods(ExecutableElement enclosedElement) {
@@ -170,10 +123,27 @@ public class MapRProcessor extends AbstractProcessor {
                 .append("            return store.find(query).toJavaBean(clazz);\n");
     }
 
+    private void writeImplementedClass() {
+        try {
+            /*classBuilder
+                    .addField(FieldSpec.builder(metaInformation.entityClassName, "entity", Modifier.PRIVATE).build())
+                    .addMethod(MethodSpec.methodBuilder("save")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(void.class)
+                            .addParameter(metaInformation.entityClassName, "entity")
+                            .addStatement("this.entity = entity")
+                            .build());*/
+            JavaFile javaFile = JavaFile.builder(metaInformation.packageName, classBuilder.build())
+                    .build();
+            javaFile.writeTo(processingEnv.getFiler());
+        } catch (Exception ex) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, ex.getMessage());
+        }
+    }
 
     private void initProcessorAttributes(TypeElement interfaceElement) {
         metaInformation = new MetaInformation(interfaceElement, processingEnv);
         this.interfaceElement = interfaceElement;
-        classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName + "Nutte"); //TODO entfernen "Nutte"
+        classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName);
     }
 }
