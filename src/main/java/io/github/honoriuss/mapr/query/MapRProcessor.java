@@ -5,6 +5,7 @@ import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
 import org.ojai.store.Connection;
+import org.ojai.store.DocumentStore;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -47,15 +48,6 @@ public class MapRProcessor extends AbstractProcessor {
         writeImplementedClass();
     }
 
-    private void implementMethods() {
-        // Generiere Implementierungen für jede Methode im Interface
-        for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
-            if (enclosedElement.getKind() == ElementKind.METHOD) {
-                generateMethods((ExecutableElement) enclosedElement);
-            }
-        }
-    }
-
     private void implementHead() {
         classBuilder
                 .addAnnotation(Component.class)
@@ -83,13 +75,28 @@ public class MapRProcessor extends AbstractProcessor {
                 .build());
     }
 
+    private void implementMethods() {
+        // Generiere Implementierungen für jede Methode im Interface
+        for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
+            if (enclosedElement.getKind() == ElementKind.METHOD) {
+                generateMethods((ExecutableElement) enclosedElement);
+            }
+        }
+    }
+
     private void generateMethods(ExecutableElement enclosedElement) {
-        generatedCode.append("    @Override\n");
-        generatedCode.append("    public ")
-                .append(enclosedElement.getReturnType())
-                .append(" ")
-                .append(enclosedElement.getSimpleName())
-                .append("(");
+        //TODO Unterschiedung von void und alles andere
+        //TODO inhalt des enclosedElement mit geben
+        classBuilder
+                .addMethod(MethodSpec.methodBuilder(
+                                enclosedElement.getSimpleName().toString())
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(void.class)
+                        .addCode(String.format("try (%s store = connection.getStore(dbPath)) {\n", ClassName.get(DocumentStore.class)))
+                        //TODO hier weiter machen, den Inhalt zu erstellen
+                        .addCode("}")
+                        .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
 
         boolean firstParam = true;
         for (Element paramElement : enclosedElement.getParameters()) {
