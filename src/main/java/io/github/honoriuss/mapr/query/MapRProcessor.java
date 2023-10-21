@@ -9,8 +9,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.*;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
@@ -23,16 +21,17 @@ import java.util.Set;
 @SupportedAnnotationTypes("io.github.honoriuss.mapr.query.annotations.*")
 @AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {
-    private final MetaInformation metaInformation = new MetaInformation();
+    private MetaInformation metaInformation;
     private final StringBuilder generatedCode = new StringBuilder();
     private TypeSpec.Builder classBuilder;
+    private TypeElement interfaceElement;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Repository.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
                 initProcessorAttributes((TypeElement) element);
-                generateImplementation((TypeElement) element);
+                generateImplementation();
             } else {
                 processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
                         "Only interfaces can be annotated with @Repository", element);
@@ -41,25 +40,27 @@ public class MapRProcessor extends AbstractProcessor {
         return true;
     }
 
+    private void generateImplementation() {
+        implementHead();
+        implementAttributes();
+        implementConstructor();
+        implementMethods();
 
-    private void generateImplementation(TypeElement interfaceElement) {
-        implementHead(interfaceElement);
-        implementAttributes(interfaceElement);
-        implementConstructor(interfaceElement);
+        generatedCode.append("}\n");
 
+        writeImplementedClass_old(metaInformation.generatedClassName, metaInformation.packageName);
+    }
+
+    private void implementMethods() {
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
                 generateMethods((ExecutableElement) enclosedElement);
             }
         }
-
-        generatedCode.append("}\n");
-
-        writeImplementedClass_old(interfaceElement, metaInformation.generatedClassName, metaInformation.packageName);
     }
 
-    private void writeImplementedClass_old(TypeElement interfaceElement, String generatedClassName, String packageName) {
+    private void writeImplementedClass_old(String generatedClassName, String packageName) {
         try {
             JavaFileObject sourceFile = processingEnv.getFiler()
                     .createSourceFile(packageName + "." + generatedClassName, interfaceElement);
@@ -71,7 +72,7 @@ public class MapRProcessor extends AbstractProcessor {
         }
     }
 
-    private void implementHead(TypeElement interfaceElement) {
+    private void implementHead() {
         generatedCode.append("package ")
                 .append(metaInformation.packageName)
                 .append(";\n\n");
@@ -89,7 +90,7 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(" {\n\n");
     }
 
-    private void implementAttributes(TypeElement interfaceElement) {
+    private void implementAttributes() {
         generatedCode
                 .append("    private final Connection connection;\n");
 
@@ -119,7 +120,7 @@ public class MapRProcessor extends AbstractProcessor {
                 .append("\";\n");
     }
 
-    private void implementConstructor(TypeElement interfaceElement) {
+    private void implementConstructor() {
         generatedCode
                 .append("    public ")
                 .append(interfaceElement.getSimpleName())
@@ -171,13 +172,8 @@ public class MapRProcessor extends AbstractProcessor {
 
 
     private void initProcessorAttributes(TypeElement interfaceElement) {
-        metaInformation.generatedClassName = interfaceElement.getSimpleName() + "Impl";
-        metaInformation.packageName = processingEnv.getElementUtils().getPackageOf(interfaceElement).getQualifiedName().toString();
-        // Get the generic type parameter
-        DeclaredType declaredType = (DeclaredType) interfaceElement.getInterfaces().get(0);
-        TypeMirror entityTypeMirror = declaredType.getTypeArguments().get(0);
-        metaInformation.entityClassName = ClassName.get((TypeElement) processingEnv.getTypeUtils().asElement(entityTypeMirror));
-
+        metaInformation = new MetaInformation(interfaceElement, processingEnv);
+        this.interfaceElement = interfaceElement;
         classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName + "Nutte"); //TODO entfernen "Nutte"
     }
 }
