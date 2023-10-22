@@ -22,7 +22,6 @@ import java.util.Set;
 @AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {
     private MetaInformation metaInformation;
-    private final StringBuilder generatedCode = new StringBuilder();
     private TypeSpec.Builder classBuilder;
     private TypeElement interfaceElement;
 
@@ -79,14 +78,22 @@ public class MapRProcessor extends AbstractProcessor {
         // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                generateMethods((ExecutableElement) enclosedElement);
+                generateMethod((ExecutableElement) enclosedElement);
             }
         }
     }
 
-    private void generateMethods(ExecutableElement enclosedElement) {
-        //TODO Unterschiedung von void und alles andere
-        //TODO inhalt des enclosedElement mit geben
+    private void generateMethod(ExecutableElement enclosedElement) { //TODO den QueryCreator nehmen
+        if (enclosedElement.getReturnType().toString().equals(void.class.toString())) {
+            //TODO Unterschiedung von void und alles andere
+            //TODO inhalt des enclosedElement mit geben
+            generateVoidMethod(enclosedElement);
+        } else {
+            generateReturnMethod(enclosedElement);
+        }
+    }
+
+    private void generateVoidMethod(ExecutableElement enclosedElement) {
         classBuilder
                 .addMethod(MethodSpec.methodBuilder(
                                 enclosedElement.getSimpleName().toString())
@@ -97,27 +104,21 @@ public class MapRProcessor extends AbstractProcessor {
                         //TODO hier weiter machen, den Inhalt zu erstellen
                         .addCode("}")
                         .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
-
-        boolean firstParam = true;
-        for (Element paramElement : enclosedElement.getParameters()) {
-            if (!firstParam) {
-                generatedCode.append(", ");
-            }
-            generatedCode.append(paramElement.asType()).append(" ").append(paramElement.getSimpleName());
-            firstParam = false;
-        }
-
-        generatedCode.append(") {\n");
-        generatedCode.append("        try (DocumentStore store = connection.getStore(dbPath)) {\n");
-        if (!enclosedElement.getReturnType().toString().equals("void")) {
-            createReturnMethod(generatedCode, enclosedElement);
-        }
-        generatedCode.append("        }\n");
-        generatedCode.append("    }\n\n");
     }
 
-    private void createReturnMethod(StringBuilder generatedCode, ExecutableElement enclosedElement) {
-        generatedCode
+    private void generateReturnMethod(ExecutableElement enclosedElement) {
+        classBuilder
+                .addMethod(MethodSpec.methodBuilder(
+                                enclosedElement.getSimpleName().toString())
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(ClassName.get(enclosedElement.getReturnType()))
+                        .addCode(String.format("try (%s store = connection.getStore(dbPath)) {\n", ClassName.get(DocumentStore.class)))
+                        //TODO hier weiter machen, den Inhalt zu erstellen
+                        .addCode("return null;\n")
+                        .addCode("}")
+                        .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
+        /*generatedCode
                 .append("            QueryCondition condition = connection.newCondition();\n")
                 .append("            var columns = QueryCreator.createCondition(\"findByTitleContains\"")
                 .append(enclosedElement.getSimpleName().toString())
@@ -127,7 +128,7 @@ public class MapRProcessor extends AbstractProcessor {
                 .append(enclosedElement.getParameters()) //TODO das ganze in Schleifen packen
                 .append("            }")
                 .append("            Query query = connection.newQuery().where(condition).build();\n")
-                .append("            return store.find(query).toJavaBean(clazz);\n");
+                .append("            return store.find(query).toJavaBean(clazz);\n");*/
     }
 
     private void writeImplementedClass() {
