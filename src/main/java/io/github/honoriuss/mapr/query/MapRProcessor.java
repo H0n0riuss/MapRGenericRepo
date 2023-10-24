@@ -12,7 +12,11 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,6 +28,7 @@ public class MapRProcessor extends AbstractProcessor {
     private MetaInformation metaInformation;
     private TypeSpec.Builder classBuilder;
     private TypeElement interfaceElement;
+    private List<? extends TypeMirror> extendsInterfaces;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -40,11 +45,17 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void generateImplementation() {
+        prepareImplementation();
         implementHead();
         implementAttributes();
         implementConstructor();
         implementMethods();
+        implementExtendsMethods();
         writeImplementedClass();
+    }
+
+    private void prepareImplementation() {
+        extendsInterfaces = interfaceElement.getInterfaces();
     }
 
     private void implementHead() {
@@ -52,6 +63,9 @@ public class MapRProcessor extends AbstractProcessor {
                 .addAnnotation(Component.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(TypeName.get(interfaceElement.asType()));
+        for (var interfaceToImplement : extendsInterfaces) {
+            classBuilder.addSuperinterface(interfaceToImplement);
+        }
     }
 
     private void implementAttributes() {
@@ -83,6 +97,17 @@ public class MapRProcessor extends AbstractProcessor {
         }
     }
 
+    private void implementExtendsMethods() {
+        for (var t : extendsInterfaces) {
+            if (t.getKind() == TypeKind.DECLARED) {
+                Element element = ((DeclaredType) t).asElement(); //TODO hier weiter machen
+                for (var e : element.getEnclosedElements()) {
+                    generateMethod((ExecutableElement) e);
+                }
+            }
+        }
+    }
+
     private void generateMethod(ExecutableElement enclosedElement) { //TODO den QueryCreator nehmen
         if (enclosedElement.getReturnType().toString().equals(void.class.toString())) {
             //TODO Unterschiedung von void und alles andere
@@ -100,9 +125,9 @@ public class MapRProcessor extends AbstractProcessor {
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
                         .returns(void.class)
-                        .addCode(String.format("try (%s store = connection.getStore(dbPath)) {\n", ClassName.get(DocumentStore.class)))
+                        .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
                         //TODO hier weiter machen, den Inhalt zu erstellen
-                        .addCode("}")
+                        .endControlFlow()
                         .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }
 
@@ -113,10 +138,10 @@ public class MapRProcessor extends AbstractProcessor {
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
                         .returns(ClassName.get(enclosedElement.getReturnType()))
-                        .addCode(String.format("try (%s store = connection.getStore(dbPath)) {\n", ClassName.get(DocumentStore.class)))
+                        .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
                         //TODO hier weiter machen, den Inhalt zu erstellen
-                        .addCode("return null;\n")
-                        .addCode("}")
+                        .addStatement("return null")
+                        .endControlFlow()
                         .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         /*generatedCode
                 .append("            QueryCondition condition = connection.newCondition();\n")
