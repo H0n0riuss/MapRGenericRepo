@@ -137,7 +137,7 @@ public class MapRProcessor extends AbstractProcessor {
                                 enclosedElement.getSimpleName().toString())
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(ClassName.get(enclosedElement.getReturnType()))
+                        .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
                         .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
                         //TODO hier weiter machen, den Inhalt zu erstellen
                         .addStatement("return null")
