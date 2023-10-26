@@ -16,6 +16,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -132,17 +133,48 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void generateReturnMethod(ExecutableElement enclosedElement) {
-        classBuilder
-                .addMethod(MethodSpec.methodBuilder(
-                                enclosedElement.getSimpleName().toString())
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
-                        .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
-                        //TODO hier weiter machen, den Inhalt zu erstellen
-                        .addStatement("return null")
-                        .endControlFlow()
-                        .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
+        List<ParameterSpec> parameterSpecs = new ArrayList<>(); //TODO refactor
+        for (VariableElement parameter : enclosedElement.getParameters()) {
+            // Konvertiere den Parameter in einen ParameterSpec und füge ihn zur Liste hinzu
+            var typeParameter = parameter.asType();
+            if (typeParameter.toString().equals("T")) {
+                typeParameter = processingEnv.getElementUtils()
+                        .getTypeElement(metaInformation.entityClassName.toString())
+                        .asType();
+            }
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                            TypeName.get(typeParameter), // Typ des Parameters
+                            parameter.getSimpleName().toString() // Name des Parameters
+                    )
+                    .build();
+            parameterSpecs.add(parameterSpec);
+        }
+        if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
+            classBuilder
+                    .addMethod(MethodSpec.methodBuilder(
+                                    enclosedElement.getSimpleName().toString())
+                            .addAnnotation(Override.class)
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(metaInformation.entityClassName) //TODO extract generic Type to class (Unterscheidung T)
+                            .addParameters(parameterSpecs)
+                            .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
+                            .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
+                            .addStatement("return null")
+                            .endControlFlow()
+                            .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
+        } else {
+            classBuilder
+                    .addMethod(MethodSpec.methodBuilder(
+                                    enclosedElement.getSimpleName().toString())
+                            .addAnnotation(Override.class)
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
+                            .addParameters(parameterSpecs)
+                            .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
+                            .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
+                            .addStatement("return null")
+                            .endControlFlow()
+                            .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         /*generatedCode
                 .append("            QueryCondition condition = connection.newCondition();\n")
                 .append("            var columns = QueryCreator.createCondition(\"findByTitleContains\"")
@@ -154,6 +186,7 @@ public class MapRProcessor extends AbstractProcessor {
                 .append("            }")
                 .append("            Query query = connection.newQuery().where(condition).build();\n")
                 .append("            return store.find(query).toJavaBean(clazz);\n");*/
+        }
     }
 
     private void writeImplementedClass() {
@@ -178,5 +211,9 @@ public class MapRProcessor extends AbstractProcessor {
         metaInformation = new MetaInformation(interfaceElement, processingEnv);
         this.interfaceElement = interfaceElement;
         classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName);
+    }
+
+    private String getGenericType() {
+        return "";
     }
 }
