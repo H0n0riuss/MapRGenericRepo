@@ -159,7 +159,7 @@ public class MapRProcessor extends AbstractProcessor {
                             .addParameters(parameterSpecs)
                             .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
                             .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
-                            .addStatement("return null")
+                            .addStatement("return null") //TODO return type in QueryGenerator auslagern
                             .endControlFlow()
                             .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         } else {
@@ -172,7 +172,7 @@ public class MapRProcessor extends AbstractProcessor {
                             .addParameters(parameterSpecs)
                             .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
                             .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
-                            .addStatement("return null")
+                            .addStatement("return null") //TODO return type in QueryGenerator auslagern
                             .endControlFlow()
                             .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         /*generatedCode
