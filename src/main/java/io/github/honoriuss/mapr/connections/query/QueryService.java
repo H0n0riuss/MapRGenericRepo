@@ -1,6 +1,7 @@
 package io.github.honoriuss.mapr.connections.query;
 
 import io.github.honoriuss.mapr.connections.DrillConnection;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,10 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QueryService {
+public abstract class QueryService {
+    private final DrillConnection drillConnection;
+
+    public QueryService(DrillConnection drillConnection) {
+        this.drillConnection = drillConnection;
+    }
 
     public ResultSet ExecuteQuery(String query) throws SQLException {
-        try (Statement st = DrillConnection.getConnection().createStatement()) {
+        try (Statement st = drillConnection.getConnection().createStatement()) {
             return st.executeQuery(query);
         }
     }
@@ -22,9 +28,9 @@ public class QueryService {
     public DrillResult getQueryResult(String query) throws SQLException {
         DrillResult result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillConnection = DrillConnection.getConnection()) {
+        try (Connection drillCon = drillConnection.getConnection()) {
             for (var distinctQuery : distinctQueries) {
-                try (var statement = drillConnection.createStatement()) {
+                try (var statement = drillCon.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {
                         result = new DrillResult(resultSet);
                     }
@@ -37,9 +43,9 @@ public class QueryService {
     public List<Map<String, Object>> getQueryResultJson(String query) throws SQLException {
         List<Map<String, Object>> result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillConnection = DrillConnection.getConnection()) {
+        try (Connection drillCon = drillConnection.getConnection()) {
             for (var distinctQuery : distinctQueries) {
-                try (var statement = drillConnection.createStatement()) {
+                try (var statement = drillCon.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {
                         result = new ArrayList<>();
                         var count = resultSet.getMetaData().getColumnCount();
