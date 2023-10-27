@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 public abstract class OjaiConnector {
     @Value("${mapr.ojai.url}")
+    private static String url;
     private static Connection connection;
 
     public static Connection getConnection() {
         if (connection == null) {
-            connection = DriverManager.getConnection("ojai:mapr:");
+            connection = DriverManager.getConnection(url);
         }
         return connection;
     }
