@@ -3,13 +3,15 @@ package io.github.honoriuss.mapr.connections;
 import org.ojai.store.Connection;
 import org.ojai.store.DriverManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-public abstract class OjaiConnector {
+@Service
+public class OjaiConnector {
     @Value("${mapr.ojai.url}")
-    private static String url;
-    private static Connection connection;
+    private String url;
+    private Connection connection;
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         if (connection == null) {
             connection = DriverManager.getConnection(url);
         }

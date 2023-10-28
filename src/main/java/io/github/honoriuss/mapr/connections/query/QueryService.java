@@ -1,7 +1,6 @@
 package io.github.honoriuss.mapr.connections.query;
 
 import io.github.honoriuss.mapr.connections.DrillConnection;
-import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
