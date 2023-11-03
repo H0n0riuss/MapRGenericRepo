@@ -4,6 +4,8 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
+import io.github.honoriuss.mapr.query.producer.QueryProducer;
+import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author H0n0riuss
@@ -126,42 +129,19 @@ public class MapRProcessor extends AbstractProcessor {
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
                         .returns(void.class)
+                        .addParameters(getParameterSpecs(enclosedElement))
                         .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
                         //TODO hier weiter machen, den Inhalt zu erstellen
+                        .addStatement(String.format("store.delete(%s)", getParameterSpecs(enclosedElement).get(0).name)) //TODO variabel gestalten
                         .endControlFlow()
                         .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }
 
     private void generateReturnMethod(ExecutableElement enclosedElement) {
-        List<ParameterSpec> parameterSpecs = new ArrayList<>(); //TODO refactor
-        for (VariableElement parameter : enclosedElement.getParameters()) {
-            // Konvertiere den Parameter in einen ParameterSpec und füge ihn zur Liste hinzu
-            var typeParameter = parameter.asType();
-            if (typeParameter.toString().equals("T")) {
-                typeParameter = processingEnv.getElementUtils()
-                        .getTypeElement(metaInformation.entityClassName.toString())
-                        .asType();
-            }
-            ParameterSpec parameterSpec = ParameterSpec.builder(
-                            TypeName.get(typeParameter), // Typ des Parameters
-                            parameter.getSimpleName().toString() // Name des Parameters
-                    )
-                    .build();
-            parameterSpecs.add(parameterSpec);
-        }
+
         if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
             classBuilder
-                    .addMethod(MethodSpec.methodBuilder(
-                                    enclosedElement.getSimpleName().toString())
-                            .addAnnotation(Override.class)
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(metaInformation.entityClassName) //TODO extract generic Type to class (Unterscheidung T)
-                            .addParameters(parameterSpecs)
-                            .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
-                            .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
-                            .addStatement("return null") //TODO return type in QueryGenerator auslagern
-                            .endControlFlow()
-                            .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
+                    .addMethod(createCode(enclosedElement, getParameterSpecs(enclosedElement))); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         } else {
             classBuilder
                     .addMethod(MethodSpec.methodBuilder(
@@ -169,10 +149,14 @@ public class MapRProcessor extends AbstractProcessor {
                             .addAnnotation(Override.class)
                             .addModifiers(Modifier.PUBLIC)
                             .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
-                            .addParameters(parameterSpecs)
+                            .addParameters(getParameterSpecs(enclosedElement))
                             .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
-                            .addCode(getGenericType()) //TODO hier weiter machen, den Inhalt zu erstellen
-                            .addStatement("return null") //TODO return type in QueryGenerator auslagern
+                            .addStatement("newEntry.set_id($T.randomUUID().toString())", UUID.class)
+                            .addStatement("$T newDoc = connection.newDocument(newEntry)", Document.class)
+                            .addStatement("store.insert(newDoc)")
+                            .addStatement("return newEntry")
+                            //.addCode(createCode(enclosedElement)) //TODO hier weiter machen, den Inhalt zu erstellen
+                            //.addStatement("return null") //TODO return type in QueryGenerator auslagern
                             .endControlFlow()
                             .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         /*generatedCode
@@ -213,7 +197,27 @@ public class MapRProcessor extends AbstractProcessor {
         classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName);
     }
 
-    private String getGenericType() {
-        return "";
+    private MethodSpec createCode(ExecutableElement enclosedElement, List<ParameterSpec> parameterSpecs) {
+        return QueryProducer.createQuery(enclosedElement, metaInformation, interfaceElement, parameterSpecs);
+    }
+
+    private List<ParameterSpec> getParameterSpecs(ExecutableElement enclosedElement){
+        List<ParameterSpec> parameterSpecs = new ArrayList<>(); //TODO refactor
+        for (VariableElement parameter : enclosedElement.getParameters()) {
+            // Konvertiere den Parameter in einen ParameterSpec und füge ihn zur Liste hinzu
+            var typeParameter = parameter.asType();
+            if (typeParameter.toString().equals("T")) {
+                typeParameter = processingEnv.getElementUtils()
+                        .getTypeElement(metaInformation.entityClassName.toString())
+                        .asType();
+            }
+            ParameterSpec parameterSpec = ParameterSpec.builder(
+                            TypeName.get(typeParameter), // Typ des Parameters
+                            parameter.getSimpleName().toString() // Name des Parameters
+                    )
+                    .build();
+            parameterSpecs.add(parameterSpec);
+        }
+        return parameterSpecs;
     }
 }

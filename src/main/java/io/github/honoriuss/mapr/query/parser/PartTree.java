@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * @author H0n0riuss
  */
 public class PartTree {
-    private static final Pattern PREFIX_TEMPLATE = Pattern.compile("^(find|read|get|query|search|stream|count|exists|delete|remove)((\\p{Lu}.*?))??By");
+    private static final Pattern PREFIX_TEMPLATE = Pattern.compile("^(save|find|read|get|query|search|stream|count|exists|delete|remove)((\\p{Lu}.*?))??By");
     private final Subject subject;
     private final List<Part> parts;
 

@@ -1,6 +1,7 @@
 package io.github.honoriuss.mapr.utils;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author H0n0riuss
@@ -14,6 +15,12 @@ public abstract class Assert {
 
     public static void hasText(@Nullable String text, String message) {
         if (!StringUtils.hasText(text)) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void containsString(@NotNull String text, String shouldContain, String message) {
+        if (!text.contains(shouldContain)) {
             throw new IllegalArgumentException(message);
         }
     }

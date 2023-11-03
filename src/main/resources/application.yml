@@ -1,0 +1,11 @@
+mapr:
+  drill:
+    connection:
+      jdbc:
+        hosts: host1,host2
+        connection_pattern: com.mapr.drill.jdbc42.Driver
+        driver: jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl
+        port: 1234
+        clusterName: unknown
+  ojai:
+    url: "ojai:mapr:"
