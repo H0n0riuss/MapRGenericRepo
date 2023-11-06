@@ -7,6 +7,8 @@ import org.junit.Test;
  * @author H0n0riuss
  */
 public class QueryCreatorTest {
+
+
     @Test
     public void createConditionTest(){
         var interfaceMethodName = "String findByTitle(String title);";

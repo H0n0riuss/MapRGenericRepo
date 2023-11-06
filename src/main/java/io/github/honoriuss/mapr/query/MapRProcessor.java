@@ -144,45 +144,12 @@ public class MapRProcessor extends AbstractProcessor {
                     .addMethod(createCode(enclosedElement, getParameterSpecs(enclosedElement))); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         } else {
             classBuilder
-                    .addMethod(MethodSpec.methodBuilder(
-                                    enclosedElement.getSimpleName().toString())
-                            .addAnnotation(Override.class)
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
-                            .addParameters(getParameterSpecs(enclosedElement))
-                            .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
-                            .addStatement("newEntry.set_id($T.randomUUID().toString())", UUID.class)
-                            .addStatement("$T newDoc = connection.newDocument(newEntry)", Document.class)
-                            .addStatement("store.insert(newDoc)")
-                            .addStatement("return newEntry")
-                            //.addCode(createCode(enclosedElement)) //TODO hier weiter machen, den Inhalt zu erstellen
-                            //.addStatement("return null") //TODO return type in QueryGenerator auslagern
-                            .endControlFlow()
-                            .build()); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
-        /*generatedCode
-                .append("            QueryCondition condition = connection.newCondition();\n")
-                .append("            var columns = QueryCreator.createCondition(\"findByTitleContains\"")
-                .append(enclosedElement.getSimpleName().toString())
-                .append("            );\n")
-                .append("            for (var column : columns) {\n")
-                .append("                condition = condition.like(column, \"test\");")
-                .append(enclosedElement.getParameters()) //TODO das ganze in Schleifen packen
-                .append("            }")
-                .append("            Query query = connection.newQuery().where(condition).build();\n")
-                .append("            return store.find(query).toJavaBean(clazz);\n");*/
+                    .addMethod(createCode(enclosedElement, getParameterSpecs(enclosedElement))); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         }
     }
 
     private void writeImplementedClass() {
         try {
-            /*classBuilder
-                    .addField(FieldSpec.builder(metaInformation.entityClassName, "entity", Modifier.PRIVATE).build())
-                    .addMethod(MethodSpec.methodBuilder("save")
-                            .addModifiers(Modifier.PUBLIC)
-                            .returns(void.class)
-                            .addParameter(metaInformation.entityClassName, "entity")
-                            .addStatement("this.entity = entity")
-                            .build());*/
             JavaFile javaFile = JavaFile.builder(metaInformation.packageName, classBuilder.build())
                     .build();
             javaFile.writeTo(processingEnv.getFiler());
