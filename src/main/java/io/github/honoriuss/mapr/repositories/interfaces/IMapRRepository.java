@@ -6,5 +6,5 @@ public interface IMapRRepository<T extends AEntity> {
     T save(T newEntry);
     void delete(String _id);
     T read(String id);
-    //boolean existsById(String id);
+    T update(T updatedEntry);
 }

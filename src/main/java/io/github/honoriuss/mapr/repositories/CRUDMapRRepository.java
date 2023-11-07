@@ -58,7 +58,7 @@ public class CRUDMapRRepository<T extends AEntity> {
     public T updateEntry(@NotNull T updatedEntry) {
         try (DocumentStore store = connection.getStore(dbPath)) {
             Document doc = connection.newDocument(updatedEntry);
-            store.insert(doc);
+            store.replace(doc);
             return updatedEntry;
         }
     }

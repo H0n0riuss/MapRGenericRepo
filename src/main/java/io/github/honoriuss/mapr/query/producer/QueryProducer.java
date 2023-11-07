@@ -23,6 +23,7 @@ public abstract class QueryProducer {
     private static final Pattern SAVE_PREFIX = Pattern.compile("^(save|insert)");
     private static final Pattern DELETE_PREFIX = Pattern.compile("^(remove|delete)");
     private static final Pattern READ_PREFIX = Pattern.compile("^(read|find|get)");
+    private static final Pattern UPDATE_PREFIX = Pattern.compile("^(update|replace)");
     private static final Pattern READ_BY_PREFIX = Pattern.compile("^(read|find|get)(\\p{Lu}.*?)??By");
     private static final Pattern All_SUPPORTED_TYPES = Pattern.compile("Limit"); //"Order|Like|Offset|Limit|By"
 
@@ -46,9 +47,49 @@ public abstract class QueryProducer {
             return createDeleteQuery();
         } else if (READ_PREFIX.matcher(enclosedElement.toString()).find()) {
             return createReadQuery();
+        } else if (UPDATE_PREFIX.matcher(enclosedElement.toString()).find()) {
+            return createUpdateQuery();
         }
 
         return null;
+    }
+
+    private static MethodSpec createUpdateQuery() {
+        if (enclosedElement.getReturnType().toString().equals("T")) {
+            return MethodSpec.methodBuilder(
+                            enclosedElement.getSimpleName().toString())
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(metaInformation.entityClassName) //TODO extract generic Type to class (Unterscheidung T)
+                    .addParameters(parameterSpecs)
+                    .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
+                    .addStatement(createUpdateCodeBlock())
+                    .addStatement("return $L", parameterSpecs.get(0).name)
+                    //.addCode(createCode(enclosedElement)) //TODO hier weiter machen, den Inhalt zu erstellen
+                    //.addStatement("return null") //TODO return type in QueryGenerator auslagern
+                    .endControlFlow()
+                    .build();
+        }
+        return MethodSpec.methodBuilder(
+                        enclosedElement.getSimpleName().toString())
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(enclosedElement.getReturnType())) //TODO extract generic Type to class (Unterscheidung T)
+                .addParameters(parameterSpecs)
+                .beginControlFlow("try ($T store = connection.getStore(dbPath))", DocumentStore.class)
+                .addStatement(createUpdateCodeBlock())
+                .addStatement("return $L", parameterSpecs.get(0).name)
+                //.addCode(createCode(enclosedElement)) //TODO hier weiter machen, den Inhalt zu erstellen
+                //.addStatement("return null") //TODO return type in QueryGenerator auslagern
+                .endControlFlow()
+                .build();
+    }
+
+    private static String createUpdateCodeBlock() {
+        return String.valueOf(CodeBlock.builder()
+                .addStatement("$T doc = connection.newDocument($L)", Document.class, parameterSpecs.get(0).name)
+                .add("store.replace(doc)")
+                .build());
     }
 
     private static MethodSpec createReadQuery() {
