@@ -1,12 +1,12 @@
 package io.github.honoriuss.mapr.connections;
 
 import io.github.honoriuss.mapr.connections.models.MapRConfig;
+import io.github.honoriuss.mapr.connections.query.DrillResult;
 import io.github.honoriuss.mapr.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Arrays;
+import java.sql.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +24,38 @@ public class DrillConnector {
         setDrillUrl(mapRConfig.getConnectionPattern(), buildConnectionString());
 
         initJDBCDriver();
+    }
+
+    public DrillResult getQueryResult(String query) throws SQLException {
+        DrillResult result;
+        try (Statement statement = getConnection().createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(query)) {
+                result = new DrillResult(resultSet);
+            }
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getQueryResultAsJson(String query) throws SQLException {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String[] distinctQueries = query.split(";");
+        for (var distinctQuery : distinctQueries) {
+            try (Statement statement = getConnection().createStatement()) {
+                try (ResultSet resultSet = statement.executeQuery(distinctQuery)) {
+                    var count = resultSet.getMetaData().getColumnCount();
+                    while (resultSet.next()) {
+                        var json = new HashMap<String, Object>();
+                        for (var i = 1; i < count; ++i) {
+                            var columnName = resultSet.getMetaData().getColumnName(i);
+                            var value = resultSet.getObject(i);
+                            json.put(columnName, value);
+                        }
+                        result.add(json);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private String buildConnectionString() {

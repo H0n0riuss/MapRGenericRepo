@@ -1,13 +1,13 @@
 package io.github.honoriuss.mapr.repositories.services;
 
+import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import io.github.honoriuss.mapr.repositories.CRUDMapRRepository;
-import org.ojai.store.Connection;
 
 public abstract class ACRUDMapRService<T extends AEntity> {
     private final CRUDMapRRepository<T> repository;
 
-    public ACRUDMapRService(Connection connection, String tablePath, Class<T> tClass) {
+    public ACRUDMapRService(OjaiConnector connection, String tablePath, Class<T> tClass) {
         repository = new CRUDMapRRepository<>(connection, tablePath, tClass);
     }
 

@@ -1,5 +1,6 @@
 package io.github.honoriuss.mapr.repositories;
 
+import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import org.ojai.Document;
 import org.ojai.store.*;
@@ -12,7 +13,7 @@ import java.util.UUID;
  * @author H0n0riuss
  */
 public class ExtendedCRUDMapRRepository<T extends AEntity> extends CRUDMapRRepository<T> {
-    public ExtendedCRUDMapRRepository(Connection connection, String dbPath, Class<T> tClass) {
+    public ExtendedCRUDMapRRepository(OjaiConnector connection, String dbPath, Class<T> tClass) {
         super(connection, dbPath, tClass);
     }
 
