@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.connections.query;
 
-import io.github.honoriuss.mapr.connections.DrillConnection;
+import io.github.honoriuss.mapr.connections.DrillConnector;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class QueryService {
-    private final DrillConnection drillConnection;
+    private final DrillConnector drillConnector;
 
-    public QueryService(DrillConnection drillConnection) {
-        this.drillConnection = drillConnection;
+    public QueryService(DrillConnector drillConnector) {
+        this.drillConnector = drillConnector;
     }
 
     public ResultSet ExecuteQuery(String query) throws SQLException {
-        try (Statement st = drillConnection.getConnection().createStatement()) {
+        try (Statement st = drillConnector.getConnection().createStatement()) {
             return st.executeQuery(query);
         }
     }
@@ -27,7 +27,7 @@ public abstract class QueryService {
     public DrillResult getQueryResult(String query) throws SQLException {
         DrillResult result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillCon = drillConnection.getConnection()) {
+        try (Connection drillCon = drillConnector.getConnection()) {
             for (var distinctQuery : distinctQueries) {
                 try (var statement = drillCon.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {
@@ -42,7 +42,7 @@ public abstract class QueryService {
     public List<Map<String, Object>> getQueryResultJson(String query) throws SQLException {
         List<Map<String, Object>> result = null;
         var distinctQueries = query.split(";");
-        try (Connection drillCon = drillConnection.getConnection()) {
+        try (Connection drillCon = drillConnector.getConnection()) {
             for (var distinctQuery : distinctQueries) {
                 try (var statement = drillCon.createStatement()) {
                     try (var resultSet = statement.executeQuery(distinctQuery)) {

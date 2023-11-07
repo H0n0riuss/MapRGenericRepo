@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Service
-public class DrillConnection {
+public class DrillConnector {
     private final MapRConfig mapRConfig;
     private Connection connection;
     private String drillUrl;
@@ -19,7 +19,7 @@ public class DrillConnection {
         return connection;
     }
 
-    public DrillConnection(MapRConfig mapRConfig) {
+    public DrillConnector(MapRConfig mapRConfig) {
         this.mapRConfig = mapRConfig;
         setDrillUrl(mapRConfig.getConnectionPattern(), buildConnectionString());
 
