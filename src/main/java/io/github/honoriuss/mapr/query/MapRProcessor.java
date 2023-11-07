@@ -2,10 +2,10 @@ package io.github.honoriuss.mapr.query;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
+import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
 import io.github.honoriuss.mapr.query.producer.QueryProducer;
-import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,6 @@ import javax.tools.Diagnostic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * @author H0n0riuss
@@ -87,8 +86,8 @@ public class MapRProcessor extends AbstractProcessor {
     private void implementConstructor() {
         classBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(Connection.class, "connection")
-                .addStatement("this.connection = connection")
+                .addParameter(OjaiConnector.class, "connection")
+                .addStatement("this.connection = connection.getConnection()")
                 .build());
     }
 
