@@ -25,7 +25,8 @@ public abstract class QueryProducer {
     private static final Pattern READ_PREFIX = Pattern.compile("^(read|find|get)");
     private static final Pattern UPDATE_PREFIX = Pattern.compile("^(update|replace)");
     private static final Pattern READ_BY_PREFIX = Pattern.compile("^(read|find|get)(\\p{Lu}.*?)??By");
-    private static final Pattern All_SUPPORTED_TYPES = Pattern.compile("Limit"); //"Order|Like|Offset|Limit|By"
+    private static final Pattern WHERE_TYPE = Pattern.compile("(where|Where)");
+    private static final Pattern All_SUPPORTED_TYPES = Pattern.compile("(Limit|Order|Offset)");
 
     private static MetaInformation metaInformation;
     private static TypeElement interfaceElement;
@@ -138,6 +139,20 @@ public abstract class QueryProducer {
         do //TODO lieber ein normaler for-loop, wegen dem Index
         {//TODO alle möglichen Bausteine die es gibt nehmen und dann den nächsten Teil bis bekannter Baustein existiert nehmen und dann erstellen
             keyword = iterator.next();
+            if (WHERE_TYPE.matcher(keyword).find()) {
+                var after = new ArrayList<String>();
+                while (iterator.hasNext()) {
+                    var next = iterator.next();
+                    matcher = All_SUPPORTED_TYPES.matcher(keyword);
+                    if (matcher.find()) {
+                        break;
+                    }
+                    after.add(next);
+                }
+                result.add(QueryMapper.createCondition(after));
+                result.add(".where(condition)");
+            }
+
             matcher = All_SUPPORTED_TYPES.matcher(keyword);
             if (matcher.find()) {//TODO Methode die String zurückgibt, die aus dem String Keyword das richtige von MapR ausgibt
                 result.add(String.format(".%s($L)", matcher.group(0).toLowerCase()), parameterSpecs.get(1).name); //TODO index
