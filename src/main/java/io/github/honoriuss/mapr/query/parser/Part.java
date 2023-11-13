@@ -4,18 +4,41 @@ import org.springframework.util.Assert;
 
 import java.beans.Introspector;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * @author H0n0riuss
  */
 public class Part {
     private final Type type;
+    private final String[] properties;
 
     public Part(String source) {
         Assert.hasText(source, "Part source must not be null or empty");
 
         this.type = Part.Type.fromProperty(source);
+        properties = new String[type.numberOfArguments];
+        extractProperties(source);
+    }
+
+    public Type getType() {
+        return this.type;
+    }
+
+    public String[] getProperties() {
+        return this.properties;
+    }
+
+    private void extractProperties(String source) {
+
+    }
+
+    public static boolean isValidType(String input) {
+        try {
+            Type.valueOf(input);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public enum Type {
