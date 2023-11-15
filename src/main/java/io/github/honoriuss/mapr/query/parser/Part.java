@@ -10,26 +10,21 @@ import java.util.*;
  */
 public class Part {
     private final Type type;
-    private final String[] properties;
+    private final List<String> properties;
 
     public Part(String source) {
         Assert.hasText(source, "Part source must not be null or empty");
 
-        this.type = Part.Type.fromProperty(source);
-        properties = new String[type.numberOfArguments];
-        extractProperties(source);
+        this.type = Part.Type.fromProperty(source); //TODO no need if PartTrees decides
+        properties = new ArrayList<>();
     }
 
     public Type getType() {
         return this.type;
     }
 
-    public String[] getProperties() {
+    public List<String> getProperties() {
         return this.properties;
-    }
-
-    private void extractProperties(String source) {
-
     }
 
     public static boolean isValidType(String input) {
@@ -39,6 +34,10 @@ public class Part {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public void addProperty(String newProperty) {
+        properties.add(newProperty);
     }
 
     public enum Type {

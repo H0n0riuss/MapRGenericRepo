@@ -1,21 +1,27 @@
 package io.github.honoriuss.mapr.query.parser;
 
+import io.github.honoriuss.mapr.repositories.entities.AEntity;
 import org.junit.Test;
 
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 /**
  * @author H0n0riuss
  */
 public class PartTreeTest {
 
+    public class TestClazz extends AEntity {
+        public String text;
+    }
     @Test
     public void testSplitByKeywords() {
-        String input = "Keyword1Text1Keyword2Text2Keyword3Text3";
-        /*var result = PartTree.splitByKeywords(input, "Keyword1", "Keyword2", "Keyword3");
-
+        String input = "findByTextWhereTextLike";
+        var result = new PartTree(input, TestClazz.class);
+        assertNotNull(result);
+/*
         assertEquals(3, result.size());
         assertEquals("Keyword1Text1", result.get(0));
         assertEquals("Keyword2Text2", result.get(1));

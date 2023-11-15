@@ -18,46 +18,62 @@ public class PartTree {
     private static final String SPLITTER = "(?=[A-Z])";
     private final Subject subject;
     private final List<Part> parts = new ArrayList<>();
+    private final Class<?> clazz;
 
     public PartTree(String source, Class<?> clazz) {
         Assert.notNull(source, "Source must not be null");
+        Assert.notNull(clazz, "Class cant be null"); //TODO may it can be null?
+        this.clazz = clazz;
         Matcher matcher = PREFIX_TEMPLATE.matcher(source);
         if (!matcher.find()) {
             this.subject = new Subject(Optional.empty());
         } else {
             this.subject = new Subject(Optional.of(matcher.group(0)));
-            source = matcher.group(1);
+            source = source.substring(matcher.group(0).length());
         }
-        createParts(source, clazz);
 
+        var StringParts = extractStringParts(source);
+        createParts(StringParts);
     }
 
-    private void createParts(String source, Class<?> clazz) {
+    private void createParts(List<String> stringParts) {
         var keywords = Part.Type.ALL_KEYWORDS;
+        for (int i = 0; i < stringParts.size(); ++i) {
+            var StringPart = stringParts.get(i);
+            Part part;
+            if (keywords.contains(StringPart)) {
+                part = new Part(StringPart);
+                for (int j = 1; j < part.getType().getNumberOfArguments(); ++j) {
+                    part.addProperty(stringParts.get(i + j));
+                    ++i;
+                }
+                parts.add(part);
+            }
+        }
+    }
+
+    private List<String> extractStringParts(String source) {
+        var extractedKeywords = new ArrayList<String>();
+        var keywords = new ArrayList<>(Part.Type.ALL_KEYWORDS);
         FieldUtils.getAllFieldsList(clazz).forEach(field -> keywords.add(field.getName()));
 
-        //var splitSource = splitByKeywords(source, String.valueOf(keywords));
-        //for (var split : splitSource) {
-            //var part = new Part(split);
-            //this.parts.add(part);
-        //}
-    }
-
-    /*public static List<String> splitByKeywords(String source, String... keywords) {
-        var resultList = new ArrayList<String>();
-        var regex = String.join("|", keywords);
-        var splitSource = source.split(regex);
-        var part = "";
-        for (var split : splitSource) {
-            if (Part.isValidType(split)) {
-                part = part.concat(split);
+        while (source.length() > 0) {
+            boolean keywordFound = false;
+            for (String keyword : keywords) {
+                if (source.startsWith(keyword)) {
+                    source = source.substring(keyword.length());
+                    keywordFound = true;
+                    extractedKeywords.add(keyword);
+                    break;
+                }
             }
-            part = part.concat(split);
-            resultList.add(part);
-        }
 
-        return resultList;
-    }*/
+            if (!keywordFound) {
+                throw new IllegalArgumentException("No keyword or attribute matches the method name.");
+            }
+        }
+        return extractedKeywords;
+    }
 
     private static class Subject {
         //private final Pattern LIMITED_QUERY_TEMPLATE = Pattern.compile("^(find|read|get|query|search|stream)(Distinct)?(First|Top)(\\d*)?(\\p{Lu}.*?)??By");
