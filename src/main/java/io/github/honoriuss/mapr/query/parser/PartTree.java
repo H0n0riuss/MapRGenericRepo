@@ -55,7 +55,7 @@ public class PartTree {
     private List<String> extractStringParts(String source) {
         var extractedKeywords = new ArrayList<String>();
         var keywords = new ArrayList<>(Part.Type.ALL_KEYWORDS);
-        FieldUtils.getAllFieldsList(clazz).forEach(field -> keywords.add(field.getName()));
+        FieldUtils.getAllFieldsList(clazz).forEach(field -> keywords.add(field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1)));
 
         while (source.length() > 0) {
             boolean keywordFound = false;

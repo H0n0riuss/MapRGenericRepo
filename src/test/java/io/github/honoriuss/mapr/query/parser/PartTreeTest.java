@@ -18,7 +18,7 @@ public class PartTreeTest {
     }
     @Test
     public void testSplitByKeywords() {
-        String input = "findByTextWhereTextLike";
+        String input = "findByTextLike";
         var result = new PartTree(input, TestClazz.class);
         assertNotNull(result);
 /*
