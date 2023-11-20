@@ -1,21 +1,18 @@
 package io.github.honoriuss.mapr.query.parser;
 
 import io.github.honoriuss.mapr.utils.Assert;
-import oadd.org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author H0n0riuss
  */
 public class PartTree {
     private static final Pattern PREFIX_TEMPLATE = Pattern.compile("^(save|find|read|get|query|search|stream|count|exists|delete|remove)((\\p{Lu}.*?))??By");
-
     private static final String SPLITTER = "(?=[A-Z])";
     private final Subject subject;
     private final List<Part> parts = new ArrayList<>();
@@ -32,74 +29,11 @@ public class PartTree {
             this.subject = new Subject(Optional.of(matcher.group()));
             source = source.substring(matcher.group().length());
         }
-
-        var StringParts = extractStringParts(source);
-        createParts(StringParts);
     }
 
-    private MethodParts parseMethodName(String methodName) {
-        MethodParts methodParts = new MethodParts();
-
-        Matcher matcher = PREFIX_TEMPLATE.matcher(methodName);
-
-        if (matcher.find()) {
-            methodParts.prefix = matcher.group();
-            methodName = methodName.substring(matcher.end());
-        }
-
-        // Sucht nach den Attributen im Methodennamen
-        Pattern attributePattern = Pattern.compile("([A-Z][a-z]*)");
-        matcher = attributePattern.matcher(methodName);
-
-        while (matcher.find()) {
-            methodParts.attributes.add(matcher.group());
-        }
-
-        return methodParts;
-    }
-
-    public class MethodParts {
-        String prefix = "";
-        List<String> attributes = new ArrayList<>();
-    }
-
-    private void createParts(List<String> stringParts) {
-        var keywords = Part.Type.ALL_KEYWORDS;
-        for (int i = 0; i < stringParts.size(); ++i) {
-            var StringPart = stringParts.get(i);
-            Part part;
-            if (keywords.contains(StringPart)) {
-                part = new Part(StringPart);
-                for (int j = 1; j < part.getType().getNumberOfArguments(); ++j) {
-                    part.addProperty(stringParts.get(i + j));
-                    ++i;
-                }
-                parts.add(part);
-            }
-        }
-    }
-
-    private List<String> extractStringParts(String source) {
-        var extractedKeywords = new ArrayList<String>();
-        var keywords = new ArrayList<>(Part.Type.ALL_KEYWORDS);
-        FieldUtils.getAllFieldsList(clazz).forEach(field -> keywords.add(field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1)));
-
-        while (source.length() > 0) {
-            boolean keywordFound = false;
-            for (String keyword : keywords) {
-                if (source.startsWith(keyword)) {
-                    source = source.substring(keyword.length());
-                    keywordFound = true;
-                    extractedKeywords.add(keyword);
-                    break;
-                }
-            }
-
-            if (!keywordFound) {
-                throw new IllegalArgumentException("No keyword or attribute matches the method name.");
-            }
-        }
-        return extractedKeywords;
+    private static String[] split(String text, String keyword) {
+        Pattern pattern = Pattern.compile(String.format("(%s)(?=(\\p{Lu}|\\P{InBASIC_LATIN}))", keyword));
+        return pattern.split(text);
     }
 
     private static class Subject {
@@ -156,6 +90,63 @@ public class PartTree {
             return (Boolean)subject.map((it) -> {
                 return pattern.matcher(it).find();
             }).orElse(false);
+        }
+    }
+
+    private static class Predicate {
+        private static final Pattern ALL_IGNORE_CASE = Pattern.compile("AllIgnor(ing|e)Case");
+        private static final String ORDER_BY = "OrderBy";
+        private final List<OrPart> nodes;
+        //private final OrderBySource orderBySource;
+        private boolean alwaysIgnoreCase;
+
+        public Predicate(String predicate, Class<?> domainClass) {
+            String[] parts = PartTree.split(this.detectAndSetAllIgnoreCase(predicate), "OrderBy");
+            if (parts.length > 2) {
+                throw new IllegalArgumentException("OrderBy must not be used more than once in a method name");
+            } else {
+                this.nodes = (List) Arrays.stream(PartTree.split(parts[0], "Or")).filter(StringUtils::hasText).map((part) -> {
+                    return new OrPart(part, domainClass, this.alwaysIgnoreCase);
+                }).collect(Collectors.toList());
+          //      this.orderBySource = parts.length == 2 ? new OrderBySource(parts[1], Optional.of(domainClass)) : OrderBySource.EMPTY;
+            }
+        }
+
+        private String detectAndSetAllIgnoreCase(String predicate) {
+            Matcher matcher = ALL_IGNORE_CASE.matcher(predicate);
+            if (matcher.find()) {
+                this.alwaysIgnoreCase = true;
+                predicate = predicate.substring(0, matcher.start()) + predicate.substring(matcher.end(), predicate.length());
+            }
+
+            return predicate;
+        }
+
+      /*  public OrderBySource getOrderBySource() {
+            return this.orderBySource;
+        }*/
+
+        public Iterator<OrPart> iterator() {
+            return this.nodes.iterator();
+        }
+    }
+
+    public static class OrPart {
+        private final List<Part> children;
+
+        OrPart(String source, Class<?> domainClass, boolean alwaysIgnoreCase) {
+            String[] split = PartTree.split(source, "And");
+            this.children = (List)Arrays.stream(split).filter(StringUtils::hasText).map((part) -> {
+                return new Part(part/*, domainClass, alwaysIgnoreCase*/);
+            }).collect(Collectors.toList());
+        }
+
+        public Iterator<Part> iterator() {
+            return this.children.iterator();
+        }
+
+        public String toString() {
+            return StringUtils.collectionToDelimitedString(this.children, " and ");
         }
     }
 }
