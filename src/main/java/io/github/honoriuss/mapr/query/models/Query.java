@@ -9,19 +9,19 @@ import java.util.Optional;
  */
 public class Query {
     private final ReturnType returnType;
-    private final Optional<Subject> subject;
-    private final Optional<QueryTypes> queryTypes;
-    private final Optional<TypeArgs> typeArgs;
-    private final Optional<OrderBy> orderBy;
+    private final Subject subject;
+    private final QueryTypes queryTypes;
+    private final TypeArgs typeArgs;
+    private final OrderBy orderBy;
 
     public Query(String source) {
         Assert.notNull(source, "Source cant be null");
 
         this.returnType = new ReturnType(source);
-        this.subject = Optional.of(new Subject(source));
-        this.queryTypes = Optional.of(new QueryTypes(source));
-        this.typeArgs = Optional.of(new TypeArgs(source));
-        this.orderBy = Optional.of(new OrderBy(source));
+        this.subject = new Subject(source);
+        this.queryTypes = new QueryTypes(source);
+        this.typeArgs = new TypeArgs(source);
+        this.orderBy = new OrderBy(source);
     }
 
     public ReturnType getReturnType() {
@@ -29,18 +29,18 @@ public class Query {
     }
 
     public Optional<Subject> getSubject() {
-        return subject;
+        return Optional.of(subject);
     }
 
     public Optional<QueryTypes> getQueryTypes() {
-        return queryTypes;
+        return Optional.of(queryTypes);
     }
 
     public Optional<TypeArgs> getTypeArgs() {
-        return typeArgs;
+        return Optional.of(typeArgs);
     }
 
     public Optional<OrderBy> getOrderBy() {
-        return orderBy;
+        return Optional.of(orderBy);
     }
 }
