@@ -27,18 +27,16 @@ public abstract class StringUtils {
     public static String getFilenameExtension(@Nullable String path) {
         if (path == null) {
             return null;
+        }
+        int extIndex = path.lastIndexOf(46);
+        if (extIndex == -1) {
+            return null;
         } else {
-            int extIndex = path.lastIndexOf(46);
-            if (extIndex == -1) {
-                return null;
-            } else {
-                int folderIndex = path.lastIndexOf(47);
-                return folderIndex > extIndex ? null : path.substring(extIndex + 1);
-            }
+            int folderIndex = path.lastIndexOf(47);
+            return folderIndex > extIndex ? null : path.substring(extIndex + 1);
         }
     }
 
-    @Nullable
     public static boolean hasText(String str) {
         return str != null && !str.equals("");
     }
@@ -48,7 +46,10 @@ public abstract class StringUtils {
         if (MODIFIER.matcher(source).find()) {
             source = source.split(" ", 2)[1];
         }
-        source = source.split(" ", 2)[1];
+        var split = source.split(" ", 2);
+        if (split.length > 1) {
+            source = split[1];
+        }
         return source;
     }
 }

@@ -20,10 +20,10 @@ public class Subject {
 
     public Subject(String source) {
         Assert.notNull(source, "Source cant be null");
-        source = StringUtils.extractMethodName(source);
-        if (!ALL_PREFIX.matcher(source).find()) //TODO kann eigentlich auch empty sein?
+        var methodName = StringUtils.extractMethodName(source);
+        if (!ALL_PREFIX.matcher(methodName).find()) //TODO kann eigentlich auch empty sein?
             throw new IllegalArgumentException("No Subject provided");
-        this.subjectType = extractSubjectType(source);
+        this.subjectType = extractSubjectType(methodName);
     }
 
     public Optional<ESubjectType> getSubjectType() {
@@ -32,9 +32,9 @@ public class Subject {
         return Optional.of(this.subjectType);
     }
 
-    private ESubjectType extractSubjectType(String source) {
+    private ESubjectType extractSubjectType(String methodName) {
         ESubjectType subjectType = null;
-        var subject = ESubjectType.getSubjectType(source);
+        var subject = ESubjectType.getSubjectType(methodName);
         if (subject.isPresent()) {
             subjectType = subject.get();
         }
@@ -54,9 +54,9 @@ public class Subject {
             this.keywords = Arrays.asList(keywords);
         }
 
-        public static Optional<ESubjectType> getSubjectType(String source) {
+        public static Optional<ESubjectType> getSubjectType(String methodName) {
             for (var keyword : ALL_KEYWORDS) {
-                if (source.startsWith(keyword)) {
+                if (methodName.startsWith(keyword)) {
                     return Arrays.stream(ESubjectType.values())
                             .filter(k -> k.keywords.contains(keyword))
                             .findFirst();
