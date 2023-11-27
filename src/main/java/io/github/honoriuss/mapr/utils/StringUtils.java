@@ -1,7 +1,12 @@
 package io.github.honoriuss.mapr.utils;
 
+import oadd.org.apache.commons.lang3.reflect.FieldUtils;
+
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author H0n0riuss
@@ -51,5 +56,14 @@ public abstract class StringUtils {
             source = split[1];
         }
         return source;
+    }
+
+    public static List<String> getAttributesFromClass(Class<?> clazz){
+        Assert.notNull(clazz, "Class cant be null");
+
+        return FieldUtils.getAllFieldsList(clazz)
+                .stream()
+                .map(Field::getName)
+                .collect(Collectors.toList());
     }
 }

@@ -1,6 +1,7 @@
 package io.github.honoriuss.mapr.query.models;
 
 import io.github.honoriuss.mapr.utils.Assert;
+import io.github.honoriuss.mapr.utils.StringUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -11,9 +12,12 @@ import java.util.regex.Pattern;
 public class QueryType {
     private final Pattern BY = Pattern.compile("By");
     private final List<EQueryType> eQueryTypeList;
+    private final Class<?> clazz;
 
-    public QueryType(String source) {
+    public QueryType(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
+        this.clazz = clazz;
+
         if (!hasQueryType(source)) {
             eQueryTypeList = null;
             return;
@@ -21,6 +25,10 @@ public class QueryType {
 
         var methodName = extractMethodNameAfterBy(source);
         eQueryTypeList = extractQueryTypes(methodName);
+    }
+
+    public QueryType(String source) {
+        this(source, null);
     }
 
     public Optional<List<EQueryType>> getEQueryTypeList() {
@@ -37,17 +45,36 @@ public class QueryType {
     private List<EQueryType> extractQueryTypes(String source) {
         var resultList = new ArrayList<EQueryType>();
         source = source.split("\\(")[0];
+        Assert.hasText(source, "there should be a QueryType");
+        var keywords = EQueryType.ALL_KEYWORDS; //TODO add class parameter if present
+
+        addOptionalClassAttributes(keywords);
 
         do {
             //TODO durch enum iterieren, wenn keyword gefunden, dann Liste hinzufügen mit String davor... und splitten
-
+            for (var keyword : keywords) {
+                if (source.startsWith(keyword)) {
+                    source = source.substring(keyword.length());
+                    resultList.add(EQueryType.valueOf(keyword));
+                }
+            }
         } while (source.length() != 0);
 
         return resultList;
     }
 
+    private void addOptionalClassAttributes(Collection<String> keywords) {
+        if (this.getClazz().isPresent()) {
+            keywords.addAll(StringUtils.getAttributesFromClass(this.clazz));
+        }
+    }
+
     private boolean hasQueryType(String source) {
         return BY.matcher(source).find();
+    }
+
+    private Optional<Class<?>> getClazz() {
+        return this.clazz == null ? Optional.empty() : Optional.of(this.clazz);
     }
 
     public enum EQueryType {
