@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public class QueryType {
     private final Pattern BY = Pattern.compile("By");
-    private final List<EQueryType> eQueryTypeList;
+    private final List<String> eQueryTypeList;
     private final Class<?> clazz;
 
     public QueryType(String source, Class<?> clazz) {
@@ -31,7 +31,7 @@ public class QueryType {
         this(source, null);
     }
 
-    public Optional<List<EQueryType>> getEQueryTypeList() {
+    public Optional<List<String>> getEQueryTypeList() {
         if (eQueryTypeList == null) {
             return Optional.empty();
         }
@@ -42,8 +42,8 @@ public class QueryType {
         return source.split("By")[1];
     }
 
-    private List<EQueryType> extractQueryTypes(String source) {
-        var resultList = new ArrayList<EQueryType>();
+    private List<String> extractQueryTypes(String source) {
+        var resultList = new ArrayList<String>();
         source = source.split("\\(")[0];
         Assert.hasText(source, "there should be a QueryType");
         var keywords = EQueryType.ALL_KEYWORDS; //TODO add class parameter if present
@@ -51,14 +51,20 @@ public class QueryType {
         addOptionalClassAttributes(keywords);
 
         do {
-            //TODO durch enum iterieren, wenn keyword gefunden, dann Liste hinzufügen mit String davor... und splitten
+            var hasKeyword = false;
             for (var keyword : keywords) {
-                if (source.startsWith(keyword)) {
-                    source = source.substring(keyword.length());
-                    resultList.add(EQueryType.valueOf(keyword));
+                if (!source.startsWith(keyword)) {
+                    continue;
                 }
+                source = source.substring(keyword.length());
+                resultList.add(keyword);
+                hasKeyword = true;
+                break;
             }
-        } while (source.length() != 0);
+            if (!hasKeyword) {
+                throw new IllegalArgumentException("No keyword or class attribute in source");
+            }
+        } while (!source.isEmpty());
 
         return resultList;
     }
