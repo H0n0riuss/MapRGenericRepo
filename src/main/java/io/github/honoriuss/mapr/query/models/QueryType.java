@@ -39,14 +39,14 @@ public class QueryType {
     }
 
     private String extractMethodNameAfterBy(String source) {
-        return source.split("By")[1];
+        return source.split("By", 2)[1];
     }
 
     private List<String> extractQueryTypes(String source) {
         var resultList = new ArrayList<String>();
         source = source.split("\\(")[0];
         Assert.hasText(source, "there should be a QueryType");
-        var keywords = EQueryType.ALL_KEYWORDS; //TODO add class parameter if present
+        var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
 
         addOptionalClassAttributes(keywords);
 
@@ -69,9 +69,14 @@ public class QueryType {
         return resultList;
     }
 
-    private void addOptionalClassAttributes(Collection<String> keywords) {
-        if (this.getClazz().isPresent()) {
-            keywords.addAll(StringUtils.getAttributesFromClass(this.clazz));
+    private void addOptionalClassAttributes(Collection<String> collection) {
+        if (this.getClazz().isEmpty()) {
+            return;
+        }
+        var attributes = StringUtils.getAttributesFromClass(this.clazz);
+        for (var attribute : attributes) {
+            var modifiedAttribute = Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
+            collection.add(modifiedAttribute);
         }
     }
 
@@ -87,8 +92,9 @@ public class QueryType {
         LIKE("Like", "IsLike"),
         LIMIT("Limit", "IsLimit"),
         BETWEEN("Between", "IsBetween"),
+        ORDER_BY("OrderBy"),
         SIMPLE_PROPERTY("Is", "Equals");
-        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, SIMPLE_PROPERTY);
+        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, ORDER_BY, SIMPLE_PROPERTY);
         public static final Collection<String> ALL_KEYWORDS;
         private final List<String> keywords;
         private final int numberOfArguments;
