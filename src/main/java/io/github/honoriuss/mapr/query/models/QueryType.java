@@ -92,7 +92,7 @@ public class QueryType {
         LIKE("Like", "IsLike"),
         LIMIT("Limit", "IsLimit"),
         BETWEEN("Between", "IsBetween"),
-        ORDER_BY("OrderBy"),
+        ORDER_BY("Order", "OrderBy"),
         SIMPLE_PROPERTY("Is", "Equals");
         private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, ORDER_BY, SIMPLE_PROPERTY);
         public static final Collection<String> ALL_KEYWORDS;
