@@ -124,9 +124,8 @@ public class QueryType {
         LIKE("like", "Like", "IsLike"),
         LIMIT("limit", "Limit", "IsLimit"),
         BETWEEN("between", 2, "Between", "IsBetween"),
-        ORDER_BY("order", "OrderBy"),
         SIMPLE_PROPERTY("is", "Is", "Equals");
-        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, ORDER_BY, SIMPLE_PROPERTY);
+        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, SIMPLE_PROPERTY);
         public static final Collection<String> ALL_KEYWORDS;
         private final List<String> keywords;
         private final int numberOfArguments;
