@@ -6,40 +6,72 @@ import io.github.honoriuss.mapr.utils.StringUtils;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static io.github.honoriuss.mapr.query.parser.Part.Type.fromProperty;
+
 /**
  * @author H0n0riuss
  */
 public class QueryType {
     private final Pattern BY = Pattern.compile("By");
-    private final List<String> eQueryTypeList;
+    private final List<String> queryTypeStringList;
     private final Class<?> clazz;
+    private final List<Object> eQueryTypeList;
 
     public QueryType(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
         this.clazz = clazz;
 
         if (!hasQueryType(source)) {
-            eQueryTypeList = null;
+            this.queryTypeStringList = null;
+            this.eQueryTypeList = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
-        eQueryTypeList = extractQueryTypes(methodName);
+        queryTypeStringList = extractQueryTypes(methodName);
+        eQueryTypeList = createEQueryList();
     }
 
     public QueryType(String source) {
         this(source, null);
     }
 
-    public Optional<List<String>> getEQueryTypeList() {
+    public Optional<List<String>> getQueryTypeStringList() {
+        if (queryTypeStringList == null) {
+            return Optional.empty();
+        }
+        return Optional.of(queryTypeStringList);
+    }
+
+    public Optional<List<Object>> getEQueryTypeList() {
         if (eQueryTypeList == null) {
             return Optional.empty();
         }
         return Optional.of(eQueryTypeList);
     }
 
+    private List<Object> createEQueryList() {
+        var size = this.queryTypeStringList.size();
+        var result = new ArrayList<>(size);
+        var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
+        var pattern = Pattern.compile(String.join("|", keywords));
+
+        for (int i = 0; i < size; ++i) {
+            var queryType = this.queryTypeStringList.get(i);
+
+            if (pattern.matcher(queryType).find()) {
+                var eQueryType = fromProperty(queryType);
+                result.add(eQueryType);
+                for (int j = 1; j <= eQueryType.getNumberOfArguments(); ++j) { //TODO validation
+                    result.add(this.queryTypeStringList.get(i - j));
+                }
+            }
+        }
+        return result;
+    }
+
     private String extractMethodNameAfterBy(String source) {
-        return source.split("By", 2)[1];
+        return source.split("(By|OrderBy)")[1];
     }
 
     private List<String> extractQueryTypes(String source) {
@@ -89,27 +121,33 @@ public class QueryType {
     }
 
     public enum EQueryType {
-        LIKE("Like", "IsLike"),
-        LIMIT("Limit", "IsLimit"),
-        BETWEEN("Between", "IsBetween"),
-        ORDER_BY("Order", "OrderBy"),
-        SIMPLE_PROPERTY("Is", "Equals");
+        LIKE("like", "Like", "IsLike"),
+        LIMIT("limit", "Limit", "IsLimit"),
+        BETWEEN("between", 2, "Between", "IsBetween"),
+        ORDER_BY("order", "OrderBy"),
+        SIMPLE_PROPERTY("is", "Is", "Equals");
         private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, ORDER_BY, SIMPLE_PROPERTY);
         public static final Collection<String> ALL_KEYWORDS;
         private final List<String> keywords;
         private final int numberOfArguments;
+        private final String translation;
 
-        EQueryType(String... keywords) {
-            this(1, keywords);
+        EQueryType(String translation, String... keywords) {
+            this(translation, 1, keywords);
         }
 
-        EQueryType(int numberOfArguments, String... keywords) {
+        EQueryType(String translation, int numberOfArguments, String... keywords) {
+            this.translation = translation;
             this.numberOfArguments = numberOfArguments;
             this.keywords = Arrays.asList(keywords);
         }
 
         public int getNumberOfArguments() {
             return this.numberOfArguments;
+        }
+
+        public String getTranslation() {
+            return this.translation;
         }
 
         public EQueryType fromProperty(String rawProperty) {
