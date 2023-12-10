@@ -4,6 +4,7 @@ import io.github.honoriuss.mapr.utils.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author H0n0riuss
@@ -32,8 +33,11 @@ public class TypeArgs {
         }
     }
 
-    public List<TypeArgModel> getTypeArgModelList() {
-        return this.typeArgModelList;
+    public Optional<List<TypeArgModel>> getTypeArgModelList() {
+        if (this.typeArgModelList.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.typeArgModelList);
     }
 
     public class TypeArgModel {

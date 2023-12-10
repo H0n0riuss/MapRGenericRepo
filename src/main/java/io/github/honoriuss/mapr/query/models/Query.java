@@ -33,18 +33,30 @@ public class Query {
     }
 
     public Optional<Subject> getSubject() {
-        return Optional.of(subject);
+        if (this.subject.getSubjectType().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.subject);
     }
 
     public Optional<QueryType> getQueryTypes() {
-        return Optional.of(queryType);
+        if (this.queryType.getEQueryTypeList().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.queryType);
     }
 
     public Optional<TypeArgs> getTypeArgs() {
-        return Optional.of(typeArgs);
+        if (this.typeArgs.getTypeArgModelList().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.typeArgs);
     }
 
     public Optional<OrderBy> getOrderBy() {
-        return Optional.of(orderBy);
+        if (this.orderBy.getAttributesToOrderBy().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.orderBy);
     }
 }
