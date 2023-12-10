@@ -15,11 +15,15 @@ public class Query {
     private final OrderBy orderBy;
 
     public Query(String source) {
+        this(source, null);
+    }
+
+    public Query(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
 
         this.returnType = new ReturnType(source);
         this.subject = new Subject(source);
-        this.queryType = new QueryType(source);
+        this.queryType = new QueryType(source, clazz);
         this.typeArgs = new TypeArgs(source);
         this.orderBy = new OrderBy(source);
     }
