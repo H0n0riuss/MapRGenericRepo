@@ -12,8 +12,9 @@ public class TypeArgsTest {
         var methodName = "public void findByText(String text);";
         var obj = new TypeArgs(methodName);
         Assert.assertNotNull(obj);
-        Assert.assertEquals("String", obj.getTypeArgModelList().get(0).argType);
-        Assert.assertEquals("text", obj.getTypeArgModelList().get(0).argName);
+        Assert.assertTrue(obj.getTypeArgModelList().isPresent());
+        Assert.assertEquals("String", obj.getTypeArgModelList().get().get(0).argType);
+        Assert.assertEquals("text", obj.getTypeArgModelList().get().get(0).argName);
     }
 
     @Test
@@ -21,11 +22,12 @@ public class TypeArgsTest {
         var methodName = "public void findByText(String text, int number, TestClass clazz);";
         var obj = new TypeArgs(methodName);
         Assert.assertNotNull(obj);
-        Assert.assertEquals("String", obj.getTypeArgModelList().get(0).argType);
-        Assert.assertEquals("text", obj.getTypeArgModelList().get(0).argName);
-        Assert.assertEquals("int", obj.getTypeArgModelList().get(1).argType);
-        Assert.assertEquals("number", obj.getTypeArgModelList().get(1).argName);
-        Assert.assertEquals("TestClass", obj.getTypeArgModelList().get(2).argType);
-        Assert.assertEquals("clazz", obj.getTypeArgModelList().get(2).argName);
+        Assert.assertTrue(obj.getTypeArgModelList().isPresent());
+        Assert.assertEquals("String", obj.getTypeArgModelList().get().get(0).argType);
+        Assert.assertEquals("text", obj.getTypeArgModelList().get().get(0).argName);
+        Assert.assertEquals("int", obj.getTypeArgModelList().get().get(1).argType);
+        Assert.assertEquals("number", obj.getTypeArgModelList().get().get(1).argName);
+        Assert.assertEquals("TestClass", obj.getTypeArgModelList().get().get(2).argType);
+        Assert.assertEquals("clazz", obj.getTypeArgModelList().get().get(2).argName);
     }
 }

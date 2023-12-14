@@ -1,11 +1,16 @@
 package io.github.honoriuss.mapr.query.parser;
 
+import io.github.honoriuss.mapr.query.models.Query;
 import io.github.honoriuss.mapr.utils.Assert;
 
 /**
  * @author H0n0riuss
  */
 public class QueryCreator {
+
+    public static Query getQuery(String interfaceMethod, Class<?> clazz) {
+        return new Query(interfaceMethod, clazz);
+    }
 
     public static String[] createCondition(String methodName) {
         Assert.hasText(methodName, "MethodName must not be null.");
