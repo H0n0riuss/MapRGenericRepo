@@ -67,12 +67,18 @@ public class QueryCreatorTest {
         Assert.assertTrue(obj.getSubject().isPresent());
         Assert.assertTrue(obj.getSubject().get().getSubjectType().isPresent());
         Assert.assertEquals(Subject.ESubjectType.READ, obj.getSubject().get().getSubjectType().get());
+
         Assert.assertTrue(obj.getQueryTypes().isPresent());
         Assert.assertTrue(obj.getQueryTypes().get().getQueryTypeStringList().isPresent());
-        Assert.assertEquals(4, obj.getQueryTypes().get().getQueryTypeStringList().get().size());
-        Assert.assertEquals("Attr1", obj.getQueryTypes().get().getQueryTypeStringList().get().get(0)); //TODO ist das wirklich das was man erwartet...
-        Assert.assertEquals("Like", obj.getQueryTypes().get().getQueryTypeStringList().get().get(1));
-        Assert.assertEquals("Attr2", obj.getQueryTypes().get().getQueryTypeStringList().get().get(2));
-        Assert.assertEquals("Limit", obj.getQueryTypes().get().getQueryTypeStringList().get().get(3));
+        var queryTypeStringList = obj.getQueryTypes().get().getQueryTypeStringList().get();
+        Assert.assertEquals(4, queryTypeStringList.size());
+        Assert.assertEquals("Attr1", queryTypeStringList.get(0)); //TODO ist das wirklich das was man erwartet...
+        Assert.assertEquals("Like", queryTypeStringList.get(1));
+        Assert.assertEquals("Attr2", queryTypeStringList.get(2));
+        Assert.assertEquals("Limit", queryTypeStringList.get(3));
+
+        Assert.assertTrue(obj.getQueryTypes().get().getQueryTypeModelList().isPresent());
+        var queryTypeList = obj.getQueryTypes().get().getQueryTypeModelList().get();
+        Assert.assertEquals(QueryType.EQueryType.LIKE, queryTypeList.get(0).getQueryType());
     }
 }

@@ -10,12 +10,15 @@ import static io.github.honoriuss.mapr.query.parser.Part.Type.fromProperty;
 
 /**
  * @author H0n0riuss
+ *
+ * Use queryTypeModelList()
  */
 public class QueryType {
     private final Pattern BY = Pattern.compile("By");
     private final List<String> queryTypeStringList;
     private final Class<?> clazz;
     private final List<Object> eQueryTypeList;
+    private final List<QueryTypeModel> queryTypeModelList;
 
     public QueryType(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
@@ -24,12 +27,14 @@ public class QueryType {
         if (!hasQueryType(source)) {
             this.queryTypeStringList = null;
             this.eQueryTypeList = null;
+            queryTypeModelList = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
         queryTypeStringList = extractQueryTypes(methodName);
         eQueryTypeList = createEQueryList();
+        queryTypeModelList = createQueryTypeModel();
     }
 
     public QueryType(String source) {
@@ -50,6 +55,13 @@ public class QueryType {
         return Optional.of(eQueryTypeList);
     }
 
+    public Optional<List<QueryTypeModel>> getQueryTypeModelList() {
+        if (this.queryTypeModelList == null) {
+            return Optional.empty();
+        }
+        return Optional.of(queryTypeModelList);
+    }
+
     private List<Object> createEQueryList() {
         var size = this.queryTypeStringList.size();
         var result = new ArrayList<>(size);
@@ -61,9 +73,30 @@ public class QueryType {
 
             if (pattern.matcher(queryType).find()) {
                 var eQueryType = fromProperty(queryType);
-                result.add(eQueryType);
+                result.add(eQueryType); //TODO Klasse erstellen, die den QueryType hat und die attribute (String) dazu
                 for (int j = 1; j <= eQueryType.getNumberOfArguments(); ++j) { //TODO validation
                     result.add(this.queryTypeStringList.get(i - j));
+                }
+            }
+        }
+        return result;
+    }
+
+    private List<QueryTypeModel> createQueryTypeModel() {
+        var size = this.queryTypeStringList.size();
+        var result = new ArrayList<QueryTypeModel>(size);
+        var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
+        var pattern = Pattern.compile(String.join("|", keywords));
+
+        for (int i = 0; i < size; ++i) {
+            var queryType = this.queryTypeStringList.get(i);
+
+            if (pattern.matcher(queryType).find()) {
+                var eQueryType = EQueryType.fromProperty(queryType);
+                var queryTypeModel = new QueryTypeModel(eQueryType);
+                result.add(queryTypeModel);
+                for (int j = 1; j <= eQueryType.getNumberOfArguments(); ++j) {
+                    queryTypeModel.addQueryAttribute(this.queryTypeStringList.get(i - j));
                 }
             }
         }
@@ -149,7 +182,7 @@ public class QueryType {
             return this.translation;
         }
 
-        public EQueryType fromProperty(String rawProperty) {
+        public static EQueryType fromProperty(String rawProperty) {
             Iterator<EQueryType> iterator = ALL.iterator();
 
             EQueryType eQueryType;
