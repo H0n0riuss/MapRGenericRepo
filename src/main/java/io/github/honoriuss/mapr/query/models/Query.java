@@ -14,12 +14,9 @@ public class Query {
     private final TypeArgs typeArgs;
     private final OrderBy orderBy;
 
-    public Query(String source) {
-        this(source, null);
-    }
-
     public Query(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
+        Assert.notNull(clazz, "Class (clazz) cant be null. Needed for attributes.");
 
         this.returnType = new ReturnType(source);
         this.subject = new Subject(source);
