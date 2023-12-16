@@ -8,10 +8,10 @@ import java.util.Optional;
  * @author H0n0riuss
  */
 public class QueryTypeModel {
-    private final QueryType.EQueryType queryType;
+    private final QueryPart.EQueryType queryType;
     private final List<String> queryAttributes = new ArrayList<>();
 
-    public QueryTypeModel(QueryType.EQueryType queryType) {
+    public QueryTypeModel(QueryPart.EQueryType queryType) {
         this.queryType = queryType;
     }
 
@@ -22,7 +22,7 @@ public class QueryTypeModel {
         queryAttributes.add(newEntry);
     }
 
-    public QueryType.EQueryType getQueryType() {
+    public QueryPart.EQueryType getQueryType() {
         return queryType;
     }
 

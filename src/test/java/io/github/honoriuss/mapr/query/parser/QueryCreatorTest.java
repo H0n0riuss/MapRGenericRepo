@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.query.parser;
 
-import io.github.honoriuss.mapr.query.models.QueryType;
+import io.github.honoriuss.mapr.query.models.QueryPart;
 import io.github.honoriuss.mapr.query.models.Subject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -79,6 +79,6 @@ public class QueryCreatorTest {
 
         Assert.assertTrue(obj.getQueryTypes().get().getQueryTypeModelList().isPresent());
         var queryTypeList = obj.getQueryTypes().get().getQueryTypeModelList().get();
-        Assert.assertEquals(QueryType.EQueryType.LIKE, queryTypeList.get(0).getQueryType());
+        Assert.assertEquals(QueryPart.EQueryType.LIKE, queryTypeList.get(0).getQueryType());
     }
 }

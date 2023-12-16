@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * @author H0n0riuss
  */
-public class QueryTypeTest {
+public class QueryPartTest {
 
     public class TestClass {
         public int attr1;
@@ -16,7 +16,7 @@ public class QueryTypeTest {
     @Test
     public void queryTypeConstructorTest() {
         var source = "public void findByAttr1Like";
-        var queryType = new QueryType(source, TestClass.class);
+        var queryType = new QueryPart(source, TestClass.class);
         var opt = queryType.getQueryTypeStringList();
         Assert.assertNotNull(opt);
         Assert.assertTrue(opt.isPresent());
@@ -28,7 +28,7 @@ public class QueryTypeTest {
     @Test
     public void queryTypeConstructorTest2() {
         var source = "public void findByAttr1LikeAttr2Limit";
-        var queryType = new QueryType(source, TestClass.class);
+        var queryType = new QueryPart(source, TestClass.class);
         var opt = queryType.getQueryTypeStringList();
         Assert.assertNotNull(opt);
         Assert.assertTrue(opt.isPresent());
@@ -42,14 +42,14 @@ public class QueryTypeTest {
     @Test
     public void queryTypeConstructorTest3() {
         var source = "public void findByAttr1LikeOrderByAttr2";
-        var queryType = new QueryType(source, TestClass.class);
+        var queryType = new QueryPart(source, TestClass.class);
         var opt = queryType.getEQueryTypeList();
         Assert.assertNotNull(opt);
         Assert.assertTrue(opt.isPresent());
         var value = opt.get();
         Assert.assertEquals(2, value.size());
-        if (value.get(0) instanceof QueryType.EQueryType) {
-            Assert.assertEquals(QueryType.EQueryType.LIKE, value.get(0));
+        if (value.get(0) instanceof QueryPart.EQueryType) {
+            Assert.assertEquals(QueryPart.EQueryType.LIKE, value.get(0));
         }
         Assert.assertEquals("Attr1", value.get(1));
     }
@@ -57,19 +57,19 @@ public class QueryTypeTest {
     @Test
     public void queryTypeConstructorTest4() {
         var source = "public void findByAttr1LikeAttr2Limit";
-        var queryType = new QueryType(source, TestClass.class);
+        var queryType = new QueryPart(source, TestClass.class);
         var opt = queryType.getEQueryTypeList();
         Assert.assertNotNull(opt);
         Assert.assertTrue(opt.isPresent());
 
         var value = opt.get();
         Assert.assertEquals(4, value.size());
-        if (value.get(0) instanceof QueryType.EQueryType) {
-            Assert.assertEquals(QueryType.EQueryType.LIKE, value.get(0));
+        if (value.get(0) instanceof QueryPart.EQueryType) {
+            Assert.assertEquals(QueryPart.EQueryType.LIKE, value.get(0));
         }
         Assert.assertEquals("Attr1", value.get(1));
-        if (value.get(0) instanceof QueryType.EQueryType) {
-            Assert.assertEquals(QueryType.EQueryType.LIMIT, value.get(2));
+        if (value.get(0) instanceof QueryPart.EQueryType) {
+            Assert.assertEquals(QueryPart.EQueryType.LIMIT, value.get(2));
         }
         Assert.assertEquals("Attr2", value.get(3));
     }

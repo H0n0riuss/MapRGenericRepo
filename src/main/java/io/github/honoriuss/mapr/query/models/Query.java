@@ -10,7 +10,7 @@ import java.util.Optional;
 public class Query {
     private final ReturnType returnType;
     private final Subject subject;
-    private final QueryType queryType;
+    private final QueryPart queryPart;
     private final TypeArgs typeArgs;
     private final OrderBy orderBy;
 
@@ -23,7 +23,7 @@ public class Query {
 
         this.returnType = new ReturnType(source);
         this.subject = new Subject(source);
-        this.queryType = new QueryType(source, clazz);
+        this.queryPart = new QueryPart(source, clazz);
         this.typeArgs = new TypeArgs(source);
         this.orderBy = new OrderBy(source);
     }
@@ -39,11 +39,11 @@ public class Query {
         return Optional.of(this.subject);
     }
 
-    public Optional<QueryType> getQueryTypes() {
-        if (this.queryType.getEQueryTypeList().isEmpty()) {
+    public Optional<QueryPart> getQueryTypes() {
+        if (this.queryPart.getEQueryTypeList().isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(this.queryType);
+        return Optional.of(this.queryPart);
     }
 
     public Optional<TypeArgs> getTypeArgs() {

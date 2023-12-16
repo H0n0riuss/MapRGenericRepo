@@ -11,92 +11,92 @@ import static io.github.honoriuss.mapr.query.parser.Part.Type.fromProperty;
 /**
  * @author H0n0riuss
  *
- * Use queryTypeModelList()
+ * Use queryPartModelList()
  */
-public class QueryType {
+public class QueryPart {
     private final Pattern BY = Pattern.compile("By");
-    private final List<String> queryTypeStringList;
+    private final List<String> queryPartStringList;
     private final Class<?> clazz;
-    private final List<Object> eQueryTypeList;
-    private final List<QueryTypeModel> queryTypeModelList;
+    private final List<Object> eQueryPartList;
+    private final List<QueryTypeModel> queryPartModelList;
 
-    public QueryType(String source, Class<?> clazz) {
+    public QueryPart(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
         this.clazz = clazz;
 
-        if (!hasQueryType(source)) {
-            this.queryTypeStringList = null;
-            this.eQueryTypeList = null;
-            queryTypeModelList = null;
+        if (!hasQueryPart(source)) {
+            this.queryPartStringList = null;
+            this.eQueryPartList = null;
+            queryPartModelList = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
-        queryTypeStringList = extractQueryTypes(methodName);
-        eQueryTypeList = createEQueryList();
-        queryTypeModelList = createQueryTypeModel();
+        queryPartStringList = extractQueryParts(methodName);
+        eQueryPartList = createEQueryList();
+        queryPartModelList = createQueryPartModel();
     }
 
-    public QueryType(String source) {
+    public QueryPart(String source) {
         this(source, null);
     }
 
     public Optional<List<String>> getQueryTypeStringList() {
-        if (queryTypeStringList == null) {
+        if (queryPartStringList == null) {
             return Optional.empty();
         }
-        return Optional.of(queryTypeStringList);
+        return Optional.of(queryPartStringList);
     }
 
     public Optional<List<Object>> getEQueryTypeList() {
-        if (eQueryTypeList == null) {
+        if (eQueryPartList == null) {
             return Optional.empty();
         }
-        return Optional.of(eQueryTypeList);
+        return Optional.of(eQueryPartList);
     }
 
     public Optional<List<QueryTypeModel>> getQueryTypeModelList() {
-        if (this.queryTypeModelList == null) {
+        if (this.queryPartModelList == null) {
             return Optional.empty();
         }
-        return Optional.of(queryTypeModelList);
+        return Optional.of(queryPartModelList);
     }
 
     private List<Object> createEQueryList() {
-        var size = this.queryTypeStringList.size();
+        var size = this.queryPartStringList.size();
         var result = new ArrayList<>(size);
         var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
         var pattern = Pattern.compile(String.join("|", keywords));
 
         for (int i = 0; i < size; ++i) {
-            var queryType = this.queryTypeStringList.get(i);
+            var queryPart = this.queryPartStringList.get(i);
 
-            if (pattern.matcher(queryType).find()) {
-                var eQueryType = fromProperty(queryType);
-                result.add(eQueryType); //TODO Klasse erstellen, die den QueryType hat und die attribute (String) dazu
-                for (int j = 1; j <= eQueryType.getNumberOfArguments(); ++j) { //TODO validation
-                    result.add(this.queryTypeStringList.get(i - j));
+            if (pattern.matcher(queryPart).find()) {
+                var eQueryPart = fromProperty(queryPart);
+                result.add(eQueryPart); //TODO Klasse erstellen, die den QueryPart hat und die attribute (String) dazu
+                for (int j = 1; j <= eQueryPart.getNumberOfArguments(); ++j) { //TODO validation
+                    result.add(this.queryPartStringList.get(i - j));
                 }
             }
         }
         return result;
     }
 
-    private List<QueryTypeModel> createQueryTypeModel() {
-        var size = this.queryTypeStringList.size();
+    private List<QueryTypeModel> createQueryPartModel() {
+        var size = this.queryPartStringList.size();
         var result = new ArrayList<QueryTypeModel>(size);
         var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
         var pattern = Pattern.compile(String.join("|", keywords));
 
         for (int i = 0; i < size; ++i) {
-            var queryType = this.queryTypeStringList.get(i);
+            var queryPart = this.queryPartStringList.get(i);
 
-            if (pattern.matcher(queryType).find()) {
-                var eQueryType = EQueryType.fromProperty(queryType);
-                var queryTypeModel = new QueryTypeModel(eQueryType);
-                result.add(queryTypeModel);
-                for (int j = 1; j <= eQueryType.getNumberOfArguments(); ++j) {
-                    queryTypeModel.addQueryAttribute(this.queryTypeStringList.get(i - j));
+            if (pattern.matcher(queryPart).find()) {
+                var eQueryPart = EQueryType.fromProperty(queryPart);
+                var queryPartModel = new QueryTypeModel(eQueryPart);
+                result.add(queryPartModel);
+                for (int j = 1; j <= eQueryPart.getNumberOfArguments(); ++j) {
+                    queryPartModel.addQueryAttribute(this.queryPartStringList.get(i - j));
                 }
             }
         }
@@ -107,10 +107,10 @@ public class QueryType {
         return source.split("(By|OrderBy)")[1];
     }
 
-    private List<String> extractQueryTypes(String source) {
+    private List<String> extractQueryParts(String source) {
         var resultList = new ArrayList<String>();
         source = source.split("\\(")[0];
-        Assert.hasText(source, "there should be a QueryType");
+        Assert.hasText(source, "there should be a QueryPart");
         var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
 
         addOptionalClassAttributes(keywords);
@@ -145,7 +145,7 @@ public class QueryType {
         }
     }
 
-    private boolean hasQueryType(String source) {
+    private boolean hasQueryPart(String source) {
         return BY.matcher(source).find();
     }
 
