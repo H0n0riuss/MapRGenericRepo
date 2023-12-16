@@ -36,7 +36,7 @@ public class Query {
         return Optional.of(this.subject);
     }
 
-    public Optional<QueryPart> getQueryTypes() {
+    public Optional<QueryPart> getQueryParts() {
         if (this.queryPart.getEQueryTypeList().isEmpty()) {
             return Optional.empty();
         }

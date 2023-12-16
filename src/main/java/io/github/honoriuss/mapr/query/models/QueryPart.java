@@ -154,7 +154,7 @@ public class QueryPart {
     }
 
     public enum EQueryType {
-        LIKE("like", "Like", "IsLike"),
+        LIKE("like", 2, "Like", "IsLike"),
         LIMIT("limit", "Limit", "IsLimit"),
         BETWEEN("between", 2, "Between", "IsBetween"),
         SIMPLE_PROPERTY("is", "Is", "Equals");
