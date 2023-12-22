@@ -20,6 +20,8 @@ public class QueryPart {
     private final List<Object> eQueryPartList;
     private final List<QueryTypeModel> queryPartModelList;
     private final TypeArgs typeArgs;
+    private final List<String> columnList;
+    private final List<String> argList;
 
     public QueryPart(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
@@ -30,14 +32,30 @@ public class QueryPart {
             this.eQueryPartList = null;
             this.queryPartModelList = null;
             this.typeArgs = null;
+            this.columnList = null;
+            this.argList = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
         this.typeArgs = new TypeArgs(source);
+        this.argList = createAttributeList(methodName);
+        this.columnList = new ArrayList<>();
+        createQueryPartsList(methodName);
         this.queryPartStringList = extractQueryParts(methodName);
         this.eQueryPartList = createEQueryList();
         this.queryPartModelList = createQueryPartModel();
+    }
+
+    private List<String> createAttributeList(String methodName) {
+        methodName = methodName.split("\\(")[1].split("\\)")[0];
+        var resList = new ArrayList<String>();
+        var split = methodName.split(",");
+        for (var s : split) {
+            s = s.trim();
+            resList.add(s.split(" ")[1].trim());
+        }
+        return resList;
     }
 
     public QueryPart(String source) {
@@ -63,6 +81,31 @@ public class QueryPart {
             return Optional.empty();
         }
         return Optional.of(queryPartModelList);
+    }
+
+    public Optional<List<String>> getColumnList() {
+        if (this.columnList == null) {
+            return Optional.empty();
+        }
+        return Optional.of(columnList);
+    }
+
+    public Optional<List<String>> getArgList() {
+        if (this.argList == null) {
+            return Optional.empty();
+        }
+        return Optional.of(argList);
+    }
+
+    private void createQueryPartsList(String source) {
+        var classAttributes = new ArrayList<String>();
+        addOptionalClassAttributes(classAttributes);
+        var keywords = extractQueryParts(source);
+        for (var keyword : keywords) {
+            if (classAttributes.contains(keyword)) {
+                this.columnList.add(keyword);
+            }
+        }
     }
 
     private List<Object> createEQueryList() {
@@ -91,6 +134,7 @@ public class QueryPart {
         var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
         var pattern = Pattern.compile(String.join("|", keywords));
         var argIndex = 0;
+        var columnIndex = 0;
 
         for (int i = 0; i < size; ++i) {
             var queryPart = this.queryPartStringList.get(i);
@@ -100,11 +144,14 @@ public class QueryPart {
                     throw new IllegalArgumentException("no args present");
                 }
                 var eQueryPart = EQueryType.fromProperty(queryPart);
-
-                var queryPartModel = new QueryTypeModel(eQueryPart, this.queryPartStringList.get(i - 1));
+                if (columnIndex >= this.columnList.size()) {
+                    --columnIndex;
+                }
+                var columnName = this.columnList.get(columnIndex++);
+                var queryPartModel = new QueryTypeModel(eQueryPart, columnName);
                 result.add(queryPartModel);
-                for (int j = argIndex; j < eQueryPart.getNumberOfArguments(); ++argIndex, ++j) {
-                    queryPartModel.addQueryAttribute(this.typeArgs.getTypeArgModelList().get().get(j).argName);
+                for (int j = 0; j < eQueryPart.getNumberOfArguments(); ++argIndex, ++j) {
+                    queryPartModel.addQueryAttribute(this.argList.get(j + argIndex));
                 }
             }
         }
@@ -112,7 +159,7 @@ public class QueryPart {
     }
 
     private String extractMethodNameAfterBy(String source) {
-        return source.split("(By|OrderBy)")[1];
+        return source.split("By", 2)[1];
     }
 
     private List<String> extractQueryParts(String source) {
@@ -163,27 +210,42 @@ public class QueryPart {
 
     public enum EQueryType {
         LIKE("like", "Like", "IsLike"),
-        LIMIT("limit", "Limit", "IsLimit"),
+        LIMIT("limit", false, "Limit", "IsLimit"),
         BETWEEN("between", 2, "Between", "IsBetween"),
-        SIMPLE_PROPERTY("is", "Is", "Equals");
-        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, SIMPLE_PROPERTY);
+        ORDER_BY("orderBy", "OrderBy", "orderBy", "orderby"),
+        SIMPLE_PROPERTY("is", false, "Is", "Equals");
+        private static final List<EQueryType> ALL = Arrays.asList(LIKE, LIMIT, BETWEEN, ORDER_BY, SIMPLE_PROPERTY);
         public static final Collection<String> ALL_KEYWORDS;
         private final List<String> keywords;
         private final int numberOfArguments;
         private final String translation;
+        private final boolean hasColumnName;
 
         EQueryType(String translation, String... keywords) {
-            this(translation, 1, keywords);
+            this(translation, 1, true, keywords);
         }
 
         EQueryType(String translation, int numberOfArguments, String... keywords) {
+            this(translation, numberOfArguments, true, keywords);
+        }
+
+        EQueryType(String translation, boolean hasColumnName, String... keywords) {
+            this(translation, 1, hasColumnName, keywords);
+        }
+
+        EQueryType(String translation, int numberOfArguments, boolean hasColumnName, String... keywords) {
             this.translation = translation;
             this.numberOfArguments = numberOfArguments;
             this.keywords = Arrays.asList(keywords);
+            this.hasColumnName = hasColumnName;
         }
 
         public int getNumberOfArguments() {
             return this.numberOfArguments;
+        }
+
+        public boolean hasColumnName() {
+            return this.hasColumnName;
         }
 
         public String getTranslation() {

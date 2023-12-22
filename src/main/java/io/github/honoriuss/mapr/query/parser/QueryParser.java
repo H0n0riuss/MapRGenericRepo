@@ -29,10 +29,14 @@ public abstract class QueryParser {
     }
 
     private static String createLine(QueryPart.EQueryType eQueryType, String columnName, List<String> optAttributes) {
-        var resString = new StringBuilder("." + eQueryType.getTranslation() + "(")
-                .append(columnName);
+        var resString = new StringBuilder("." + eQueryType.getTranslation() + "(");
+        if (eQueryType.hasColumnName()) {
+            resString.append(columnName);
+        }
         if (optAttributes != null && !optAttributes.isEmpty()) {
-            resString.append(", ");
+            if (eQueryType.hasColumnName()) {
+                resString.append(", ");
+            }
             var iterator = optAttributes.iterator();
             while (iterator.hasNext()) {
                 resString.append(iterator.next());

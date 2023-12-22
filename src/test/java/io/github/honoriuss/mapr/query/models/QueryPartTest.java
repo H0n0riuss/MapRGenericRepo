@@ -3,6 +3,8 @@ package io.github.honoriuss.mapr.query.models;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 /**
  * @author H0n0riuss
  */
@@ -46,7 +48,7 @@ public class QueryPartTest {
         Assert.assertNotNull(opt);
         Assert.assertTrue(opt.isPresent());
         var value = opt.get();
-        Assert.assertEquals(2, value.size());
+        Assert.assertEquals(4, value.size());
         if (value.get(0) instanceof QueryPart.EQueryType) {
             Assert.assertEquals(QueryPart.EQueryType.LIKE, value.get(0));
         }
@@ -71,5 +73,16 @@ public class QueryPartTest {
             Assert.assertEquals(QueryPart.EQueryType.LIMIT, value.get(2));
         }
         Assert.assertEquals("Like", value.get(3));
+    }
+
+    @Test
+    public void getColumnListTest(){
+        var source = "public void findByAttr1LikeLimit(String likeIt, String limitIt);";
+        var expectedList = new ArrayList<String>();
+        expectedList.add("Attr1");
+        var opt = new QueryPart(source, TestClass.class).getColumnList();
+        Assert.assertTrue(opt.isPresent());
+        var resList = opt.get();
+        Assert.assertEquals(expectedList, resList);
     }
 }

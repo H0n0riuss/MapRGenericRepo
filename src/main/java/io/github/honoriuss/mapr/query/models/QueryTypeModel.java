@@ -14,7 +14,11 @@ public class QueryTypeModel {
 
     public QueryTypeModel(QueryPart.EQueryType queryType, String columnName) {
         this.queryType = queryType;
-        this.columnName = columnName;
+        if (this.queryType.hasColumnName()) {
+            this.columnName = columnName;
+        } else {
+            this.columnName = null;
+        }
     }
 
     public void addQueryAttribute(String newEntry) {
