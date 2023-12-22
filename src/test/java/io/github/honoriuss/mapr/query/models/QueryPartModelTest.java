@@ -9,7 +9,7 @@ import org.junit.Test;
 public class QueryPartModelTest {
     @Test
     public void constructorTest() {
-        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE);
+        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE, "attr1");
         queryType.addQueryAttribute("attr1");
         Assert.assertEquals(queryType.getQueryType(), QueryPart.EQueryType.LIKE);
         Assert.assertTrue(queryType.getQueryAttributes().isPresent());
@@ -18,14 +18,14 @@ public class QueryPartModelTest {
 
     @Test
     public void getQueryTypeModelListTest() {
-        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE);
+        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE, "attr1");
         queryType.addQueryAttribute("attr1");
         Assert.assertTrue(queryType.getQueryAttributes().isPresent());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void addToManyAttributesTest() {
-        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE);
+        var queryType = new QueryTypeModel(QueryPart.EQueryType.LIKE, "attr1");
         queryType.addQueryAttribute("attr1");
         queryType.addQueryAttribute("attr2");
     }

@@ -10,7 +10,7 @@ import static io.github.honoriuss.mapr.query.parser.Part.Type.fromProperty;
 
 /**
  * @author H0n0riuss
- *
+ * <p>
  * Use queryPartModelList()
  */
 public class QueryPart {
@@ -19,6 +19,7 @@ public class QueryPart {
     private final Class<?> clazz;
     private final List<Object> eQueryPartList;
     private final List<QueryTypeModel> queryPartModelList;
+    private final TypeArgs typeArgs;
 
     public QueryPart(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");
@@ -27,14 +28,16 @@ public class QueryPart {
         if (!hasQueryPart(source)) {
             this.queryPartStringList = null;
             this.eQueryPartList = null;
-            queryPartModelList = null;
+            this.queryPartModelList = null;
+            this.typeArgs = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
-        queryPartStringList = extractQueryParts(methodName);
-        eQueryPartList = createEQueryList();
-        queryPartModelList = createQueryPartModel();
+        this.typeArgs = new TypeArgs(source);
+        this.queryPartStringList = extractQueryParts(methodName);
+        this.eQueryPartList = createEQueryList();
+        this.queryPartModelList = createQueryPartModel();
     }
 
     public QueryPart(String source) {
@@ -87,16 +90,21 @@ public class QueryPart {
         var result = new ArrayList<QueryTypeModel>(size);
         var keywords = new ArrayList<>(EQueryType.ALL_KEYWORDS);
         var pattern = Pattern.compile(String.join("|", keywords));
+        var argIndex = 0;
 
         for (int i = 0; i < size; ++i) {
             var queryPart = this.queryPartStringList.get(i);
 
             if (pattern.matcher(queryPart).find()) {
+                if (this.typeArgs.getTypeArgModelList().isEmpty()) {
+                    throw new IllegalArgumentException("no args present");
+                }
                 var eQueryPart = EQueryType.fromProperty(queryPart);
-                var queryPartModel = new QueryTypeModel(eQueryPart);
+
+                var queryPartModel = new QueryTypeModel(eQueryPart, this.queryPartStringList.get(i - 1));
                 result.add(queryPartModel);
-                for (int j = 1; j <= eQueryPart.getNumberOfArguments(); ++j) {
-                    queryPartModel.addQueryAttribute(this.queryPartStringList.get(i - j));
+                for (int j = argIndex; j < eQueryPart.getNumberOfArguments(); ++argIndex, ++j) {
+                    queryPartModel.addQueryAttribute(this.typeArgs.getTypeArgModelList().get().get(j).argName);
                 }
             }
         }
@@ -154,7 +162,7 @@ public class QueryPart {
     }
 
     public enum EQueryType {
-        LIKE("like", 2, "Like", "IsLike"),
+        LIKE("like", "Like", "IsLike"),
         LIMIT("limit", "Limit", "IsLimit"),
         BETWEEN("between", 2, "Between", "IsBetween"),
         SIMPLE_PROPERTY("is", "Is", "Equals");

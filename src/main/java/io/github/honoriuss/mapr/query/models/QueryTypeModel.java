@@ -9,10 +9,12 @@ import java.util.Optional;
  */
 public class QueryTypeModel {
     private final QueryPart.EQueryType queryType;
+    private final String columnName;
     private final List<String> queryAttributes = new ArrayList<>();
 
-    public QueryTypeModel(QueryPart.EQueryType queryType) {
+    public QueryTypeModel(QueryPart.EQueryType queryType, String columnName) {
         this.queryType = queryType;
+        this.columnName = columnName;
     }
 
     public void addQueryAttribute(String newEntry) {
@@ -24,6 +26,10 @@ public class QueryTypeModel {
 
     public QueryPart.EQueryType getQueryType() {
         return queryType;
+    }
+
+    public String getColumnName() {
+        return this.columnName;
     }
 
     public Optional<List<String>> getQueryAttributes() {
