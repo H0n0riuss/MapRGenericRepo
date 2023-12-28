@@ -14,7 +14,8 @@ public abstract class QueryParser {
         }
 
         var resultString = new StringBuilder();
-        var queryParts = query.getQueryParts().get()
+        var queryParts = query
+                .getQueryParts().get()
                 .getQueryTypeModelList().get();
         for (var queryPart : queryParts) {
             if (queryPart.getQueryAttributes().isPresent()) {
