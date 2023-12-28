@@ -12,8 +12,8 @@ public class QueryParserTest {
 
     @Test
     public void partsAsStringTest() {
-        var method = "public void findByAttr1LikeLimit(String attr1, int limit);";
-        var expected = ".like(Attr1, attr1).limit(limit)";
+        var method = "public void findByAttr1LikeLimit(String arg1, int limit);";
+        var expected = ".like(attr1, arg1).limit(limit)";
         var query = new Query(method, TestClass.class);
         var result = QueryParser.createMethodCalls(query);
         Assert.assertEquals(expected, result);

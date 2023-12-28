@@ -80,7 +80,7 @@ public class QueryPartTest {
     public void getColumnListTest(){
         var source = "public void findByAttr1LikeLimit(String likeIt, String limitIt);";
         var expectedList = new ArrayList<String>();
-        expectedList.add("Attr1");
+        expectedList.add("attr1");
         var opt = new QueryPart(source, TestClass.class).getColumnList();
         Assert.assertTrue(opt.isPresent());
         var resList = opt.get();

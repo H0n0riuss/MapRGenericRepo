@@ -100,7 +100,8 @@ public class QueryPart {
         var keywords = extractQueryParts(source);
         for (var keyword : keywords) {
             if (classAttributes.contains(keyword)) {
-                this.columnList.add(keyword);
+                var lowerKeyword = Character.toLowerCase(keyword.charAt(0)) + keyword.substring(1);
+                this.columnList.add(lowerKeyword);
             }
         }
     }
