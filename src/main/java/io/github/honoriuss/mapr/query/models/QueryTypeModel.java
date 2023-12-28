@@ -1,5 +1,7 @@
 package io.github.honoriuss.mapr.query.models;
 
+import io.github.honoriuss.mapr.query.enums.EQueryType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,11 +10,11 @@ import java.util.Optional;
  * @author H0n0riuss
  */
 public class QueryTypeModel {
-    private final QueryPart.EQueryType queryType;
+    private final EQueryType queryType;
     private final String columnName;
     private final List<String> queryAttributes = new ArrayList<>();
 
-    public QueryTypeModel(QueryPart.EQueryType queryType, String columnName) {
+    public QueryTypeModel(EQueryType queryType, String columnName) {
         this.queryType = queryType;
         if (this.queryType.hasColumnName()) {
             this.columnName = columnName;
@@ -28,7 +30,7 @@ public class QueryTypeModel {
         queryAttributes.add(newEntry);
     }
 
-    public QueryPart.EQueryType getQueryType() {
+    public EQueryType getQueryType() {
         return queryType;
     }
 

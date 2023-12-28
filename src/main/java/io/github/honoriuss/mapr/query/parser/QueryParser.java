@@ -1,11 +1,10 @@
 package io.github.honoriuss.mapr.query.parser;
 
+import io.github.honoriuss.mapr.query.enums.EQueryType;
 import io.github.honoriuss.mapr.query.models.Query;
-import io.github.honoriuss.mapr.query.models.QueryPart;
 import io.github.honoriuss.mapr.utils.Assert;
 
 import java.util.List;
-import java.util.Optional;
 
 public abstract class QueryParser {
     public static String createMethodCalls(Query query) {
@@ -28,7 +27,7 @@ public abstract class QueryParser {
         return resultString.toString();
     }
 
-    private static String createLine(QueryPart.EQueryType eQueryType, String columnName, List<String> optAttributes) {
+    private static String createLine(EQueryType eQueryType, String columnName, List<String> optAttributes) {
         var resString = new StringBuilder("." + eQueryType.getTranslation() + "(");
         if (eQueryType.hasColumnName()) {
             resString.append(columnName);

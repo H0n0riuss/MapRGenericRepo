@@ -1,5 +1,6 @@
 package io.github.honoriuss.mapr.query.models;
 
+import io.github.honoriuss.mapr.query.enums.EQueryType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,8 +50,8 @@ public class QueryPartTest {
         Assert.assertTrue(opt.isPresent());
         var value = opt.get();
         Assert.assertEquals(4, value.size());
-        if (value.get(0) instanceof QueryPart.EQueryType) {
-            Assert.assertEquals(QueryPart.EQueryType.LIKE, value.get(0));
+        if (value.get(0) instanceof EQueryType) {
+            Assert.assertEquals(EQueryType.LIKE, value.get(0));
         }
         Assert.assertEquals("Attr1", value.get(1));
     }
@@ -65,12 +66,12 @@ public class QueryPartTest {
 
         var value = opt.get();
         Assert.assertEquals(4, value.size());
-        if (value.get(0) instanceof QueryPart.EQueryType) {
-            Assert.assertEquals(QueryPart.EQueryType.LIKE, value.get(0));
+        if (value.get(0) instanceof EQueryType) {
+            Assert.assertEquals(EQueryType.LIKE, value.get(0));
         }
         Assert.assertEquals("Attr1", value.get(1));
-        if (value.get(0) instanceof QueryPart.EQueryType) {
-            Assert.assertEquals(QueryPart.EQueryType.LIMIT, value.get(2));
+        if (value.get(0) instanceof EQueryType) {
+            Assert.assertEquals(EQueryType.LIMIT, value.get(2));
         }
         Assert.assertEquals("Like", value.get(3));
     }
