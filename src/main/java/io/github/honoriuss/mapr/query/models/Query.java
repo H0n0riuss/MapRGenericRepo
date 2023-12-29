@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.query.models;
 
 import io.github.honoriuss.mapr.utils.Assert;
 
+import javax.lang.model.element.TypeElement;
 import java.util.Optional;
 
 /**
@@ -13,6 +14,14 @@ public class Query {
     private final QueryPart queryPart;
     private final TypeArgs typeArgs;
     private final OrderBy orderBy;
+
+    public Query(TypeElement typeElement, Class<?> clazz) {
+        this.returnType = new ReturnType(typeElement);
+        this.subject = new Subject(typeElement);
+        this.queryPart = new QueryPart(typeElement, clazz);
+        this.typeArgs = new TypeArgs(typeElement);
+        this.orderBy = new OrderBy(typeElement);
+    }
 
     public Query(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");

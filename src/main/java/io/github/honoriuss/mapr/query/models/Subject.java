@@ -3,6 +3,7 @@ package io.github.honoriuss.mapr.query.models;
 import io.github.honoriuss.mapr.utils.Assert;
 import io.github.honoriuss.mapr.utils.StringUtils;
 
+import javax.lang.model.element.TypeElement;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,10 @@ public class Subject {
     private static final Pattern ALL_PREFIX = Pattern.compile("(save|insert|create|remove|delete|read|find|get|update|replace)");
 
     private final ESubjectType subjectType;
+
+    public Subject(TypeElement typeElement){
+        this.subjectType = extractSubjectType(typeElement.getSimpleName().toString());
+    }
 
     public Subject(String source) {
         Assert.notNull(source, "Source cant be null");

@@ -4,6 +4,7 @@ import io.github.honoriuss.mapr.query.enums.EQueryType;
 import io.github.honoriuss.mapr.utils.Assert;
 import io.github.honoriuss.mapr.utils.StringUtils;
 
+import javax.lang.model.element.TypeElement;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,10 @@ public class QueryPart {
     private final TypeArgs typeArgs;
     private final List<String> columnList;
     private final List<String> argList;
+
+    public QueryPart(TypeElement typeElement, Class<?> clazz) {
+        this(typeElement.getSimpleName().toString(), clazz);
+    }
 
     public QueryPart(String source, Class<?> clazz) {
         Assert.notNull(source, "Source cant be null");

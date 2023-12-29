@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.query.models;
 
 import io.github.honoriuss.mapr.utils.Assert;
 
+import javax.lang.model.element.TypeElement;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,11 @@ public class ReturnType {
     private static final Pattern MODIFIER = Pattern.compile("(public|private|package)");
     private final boolean isListType; //TODO nötig?
     private final Class<?> returnType;
+
+    public ReturnType(TypeElement typeElement) {
+        this.returnType = typeElement.getClass();
+        this.isListType = isListType(this.returnType);
+    }
 
     public ReturnType(String source) {
         Assert.notNull(source, "Source cant be null");

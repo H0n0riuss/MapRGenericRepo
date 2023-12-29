@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.query.models;
 
 import io.github.honoriuss.mapr.utils.Assert;
 
+import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,13 @@ import java.util.Optional;
  */
 public class TypeArgs {
     private final ArrayList<TypeArgModel> typeArgModelList = new ArrayList<>();
+
+    public TypeArgs(TypeElement typeElement) {
+        for (var arg : typeElement.getTypeParameters()) {
+            var typeArgMode = new TypeArgModel(arg.getClass().getTypeName(), arg.getSimpleName().toString());
+            this.typeArgModelList.add(typeArgMode);
+        }
+    }
 
     public TypeArgs(String source) {
         Assert.notNull(source, "Source can`t be null");

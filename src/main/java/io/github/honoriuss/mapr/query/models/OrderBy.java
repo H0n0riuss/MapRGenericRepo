@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.query.models;
 
 import io.github.honoriuss.mapr.utils.Assert;
 
+import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,10 @@ public class OrderBy {
     private static final Pattern DIRECTION = Pattern.compile("(ASC|DESC|Asc|Desc)");
     private final List<String> attributesToOrderBy = new ArrayList<>();
     private boolean isAsc = false; //TODO prüfen was der Standard ist
+
+    public OrderBy(TypeElement typeElement) {
+        this(typeElement.getSimpleName().toString());
+    }
 
     public OrderBy(String source) {
         Assert.notNull(source, "Source can`t be null.");
