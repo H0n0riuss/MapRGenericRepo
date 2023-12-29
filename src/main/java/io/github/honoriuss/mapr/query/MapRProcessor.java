@@ -5,6 +5,7 @@ import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
+import io.github.honoriuss.mapr.query.models.Query;
 import io.github.honoriuss.mapr.query.producer.QueryProducer;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
@@ -32,6 +33,7 @@ public class MapRProcessor extends AbstractProcessor {
     private TypeSpec.Builder classBuilder;
     private TypeElement interfaceElement;
     private List<? extends TypeMirror> extendsInterfaces;
+    private Query query;
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -137,7 +139,6 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void generateReturnMethod(ExecutableElement enclosedElement) {
-
         if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
             classBuilder
                     .addMethod(createCode(enclosedElement, getParameterSpecs(enclosedElement))); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
@@ -161,13 +162,19 @@ public class MapRProcessor extends AbstractProcessor {
         metaInformation = new MetaInformation(interfaceElement, processingEnv);
         this.interfaceElement = interfaceElement;
         classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName);
+        this.query = new Query(interfaceElement, metaInformation.entityClassName.getClass());
+
+        //TODO doesnt work
+        if(this.query.getQueryParts().isEmpty() || this.query.getQueryParts().get().getColumnList().isEmpty()) return;
+        var codeBlock = CodeBlock.builder().add(this.query.getQueryParts().get().getColumnList().get().get(0)).build();
+        this.classBuilder.addJavadoc(codeBlock);
     }
 
     private MethodSpec createCode(ExecutableElement enclosedElement, List<ParameterSpec> parameterSpecs) {
         return QueryProducer.createQuery(enclosedElement, metaInformation, interfaceElement, parameterSpecs);
     }
 
-    private List<ParameterSpec> getParameterSpecs(ExecutableElement enclosedElement){
+    private List<ParameterSpec> getParameterSpecs(ExecutableElement enclosedElement) {
         List<ParameterSpec> parameterSpecs = new ArrayList<>(); //TODO refactor
         for (VariableElement parameter : enclosedElement.getParameters()) {
             // Konvertiere den Parameter in einen ParameterSpec und füge ihn zur Liste hinzu
