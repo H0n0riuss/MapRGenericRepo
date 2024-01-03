@@ -14,8 +14,8 @@
     <url>https://github.com/H0n0riuss/MapRGenericRepo</url>
 
     <properties>
-        <java-version>11</java-version>
-        <java-maven-compilation-version>11</java-maven-compilation-version>
+        <java-version>17</java-version>
+        <java-maven-compilation-version>17</java-maven-compilation-version>
         <maven.compiler.source>${java-maven-compilation-version}</maven.compiler.source>
         <maven.compiler.target>${java-maven-compilation-version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -21,12 +21,11 @@ public class QueryPart {
     private final Class<?> clazz;
     private final List<Object> eQueryPartList;
     private final List<QueryTypeModel> queryPartModelList;
-    private final TypeArgs typeArgs;
     private final List<String> columnList;
     private final List<String> argList;
 
     public QueryPart(TypeElement typeElement, Class<?> clazz) {
-        this(typeElement.getSimpleName().toString(), clazz);
+        this(typeElement.getSimpleName().toString() + "(" + typeElement.getTypeParameters() + ")", clazz);
     }
 
     public QueryPart(String source, Class<?> clazz) {
@@ -37,14 +36,12 @@ public class QueryPart {
             this.queryPartStringList = null;
             this.eQueryPartList = null;
             this.queryPartModelList = null;
-            this.typeArgs = null;
             this.columnList = null;
             this.argList = null;
             return;
         }
 
         var methodName = extractMethodNameAfterBy(source);
-        this.typeArgs = new TypeArgs(source);
         this.argList = createAttributeList(methodName);
         this.columnList = new ArrayList<>();
         createQueryPartsList(methodName);
@@ -143,9 +140,6 @@ public class QueryPart {
             var queryPart = this.queryPartStringList.get(i);
 
             if (pattern.matcher(queryPart).find()) {
-                if (this.typeArgs.getTypeArgModelList().isEmpty()) {
-                    throw new IllegalArgumentException("no args present");
-                }
                 var eQueryPart = EQueryType.fromProperty(queryPart);
                 if (columnIndex >= this.columnList.size()) {
                     --columnIndex;

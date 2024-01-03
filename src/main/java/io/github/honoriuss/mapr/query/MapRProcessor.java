@@ -124,11 +124,18 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void generateVoidMethod(ExecutableElement enclosedElement) {
+        var comment = "";
+        if (this.query.getQueryParts().isEmpty() || this.query.getQueryParts().get().getColumnList().isEmpty()) {
+            comment = "your mum";
+        } else {
+            comment = this.query.getQueryParts().get().getColumnList().get().get(0);
+        }
         classBuilder
                 .addMethod(MethodSpec.methodBuilder(
                                 enclosedElement.getSimpleName().toString())
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
+                        .addComment(comment)
                         .returns(void.class)
                         .addParameters(getParameterSpecs(enclosedElement))
                         .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
@@ -163,11 +170,6 @@ public class MapRProcessor extends AbstractProcessor {
         this.interfaceElement = interfaceElement;
         classBuilder = TypeSpec.classBuilder(metaInformation.generatedClassName);
         this.query = new Query(interfaceElement, metaInformation.entityClassName.getClass());
-
-        //TODO doesnt work
-        if(this.query.getQueryParts().isEmpty() || this.query.getQueryParts().get().getColumnList().isEmpty()) return;
-        var codeBlock = CodeBlock.builder().add(this.query.getQueryParts().get().getColumnList().get().get(0)).build();
-        this.classBuilder.addJavadoc(codeBlock);
     }
 
     private MethodSpec createCode(ExecutableElement enclosedElement, List<ParameterSpec> parameterSpecs) {

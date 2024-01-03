@@ -4,6 +4,7 @@ import io.github.honoriuss.mapr.query.enums.EQueryType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.lang.model.element.TypeElement;
 import java.util.ArrayList;
 
 /**
@@ -77,7 +78,7 @@ public class QueryPartTest {
     }
 
     @Test
-    public void getColumnListTest(){
+    public void getColumnListTest() {
         var source = "public void findByAttr1LikeLimit(String likeIt, String limitIt);";
         var expectedList = new ArrayList<String>();
         expectedList.add("attr1");
@@ -85,5 +86,10 @@ public class QueryPartTest {
         Assert.assertTrue(opt.isPresent());
         var resList = opt.get();
         Assert.assertEquals(expectedList, resList);
+    }
+
+    @Test
+    public void queryConstructorTest() {
+
     }
 }
