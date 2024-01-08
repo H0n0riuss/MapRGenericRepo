@@ -43,7 +43,7 @@ public abstract class StringUtils {
     }
 
     public static boolean hasText(String str) {
-        return str != null && !str.equals("");
+        return str != null && !str.isEmpty();
     }
 
     public static String extractMethodName(String source) {
@@ -58,7 +58,7 @@ public abstract class StringUtils {
         return source;
     }
 
-    public static List<String> getAttributesFromClass(Class<?> clazz){
+    public static List<String> getAttributesFromClass(Class<?> clazz) {
         Assert.notNull(clazz, "Class cant be null");
 
         return FieldUtils.getAllFieldsList(clazz)

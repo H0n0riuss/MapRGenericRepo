@@ -7,6 +7,7 @@ import org.ojai.store.DocumentStore;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 
 /**
  * @author H0n0riuss
@@ -28,6 +29,11 @@ public abstract class MethodGenerator {
         var methodName = enclosedElement.getSimpleName().toString();
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
 
+        var argumentStringList = new ArrayList<String>();
+        for (var argument : enclosedElement.getParameters()) {
+            argumentStringList.add(argument.getSimpleName().toString());
+        }
+
         return MethodSpec.methodBuilder(
                         methodName)
                 .addAnnotation(Override.class)
@@ -38,6 +44,7 @@ public abstract class MethodGenerator {
                 .addStatement(String.format("store.%s(%s)",
                         CrudDecider.getCrudTranslation(methodName),
                         parameterSpecs.get(0).name))
+                .addCode(StatementCreator.createStatement(methodName, argumentStringList))
                 .endControlFlow()
                 .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }

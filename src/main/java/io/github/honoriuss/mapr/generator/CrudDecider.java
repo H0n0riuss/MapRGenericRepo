@@ -1,7 +1,5 @@
 package io.github.honoriuss.mapr.generator;
 
-import java.util.*;
-
 /**
  * @author H0n0riuss
  */

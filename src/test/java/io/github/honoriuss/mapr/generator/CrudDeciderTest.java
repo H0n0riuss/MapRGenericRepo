@@ -127,5 +127,20 @@ public class CrudDeciderTest {
         var obj = CrudDecider.getCrudType(methodName);
         Assert.assertNotNull(obj);
         Assert.assertEquals(ECrudType.READ, obj);
+
+        methodName = "insertBy";
+        obj = CrudDecider.getCrudType(methodName);
+        Assert.assertNotNull(obj);
+        Assert.assertEquals(ECrudType.CREATE, obj);
+
+        methodName = "deleteBy";
+        obj = CrudDecider.getCrudType(methodName);
+        Assert.assertNotNull(obj);
+        Assert.assertEquals(ECrudType.DELETE, obj);
+
+        methodName = "updateBy";
+        obj = CrudDecider.getCrudType(methodName);
+        Assert.assertNotNull(obj);
+        Assert.assertEquals(ECrudType.UPDATE, obj);
     }
 }
