@@ -19,12 +19,11 @@ public abstract class StatementCreator {
         methodName = cutMethodName(methodName);
 
         var queryParts = extractQueryParts(methodName, clazz);
-        var columnList = queryParts.columnList;
 
         int attributesIndex = 0;
         int columnsIndex = 0;
 
-        if (queryParts.queryPartsList == null|| queryParts.queryPartsList.isEmpty()) {
+        if (queryParts.queryPartsList == null || queryParts.queryPartsList.isEmpty()) {
             return null;
         }
 
@@ -38,10 +37,10 @@ public abstract class StatementCreator {
                     throw new IllegalArgumentException("ClassList cant be null if argument needs an attribute");
                 }
                 if (queryPart.hasColumnName()) {
-                    if (columnList == null || columnList.size() < columnsIndex) {
+                    if (queryParts.columnList == null || queryParts.columnList.size() < columnsIndex) {
                         throw new IllegalArgumentException("ColumnList cant be null if column is needed");
                     }
-                    part.append(columnList.get(columnsIndex++))
+                    part.append(queryParts.columnList.get(columnsIndex++))
                             .append(", ");
 
                 }
@@ -60,6 +59,12 @@ public abstract class StatementCreator {
     }
 
     private static String cutMethodName(String methodName) {
+        if (methodName.contains("OrderBy")) { //TODO throw exception?
+            methodName = methodName.split("OrderBy")[0];
+        }
+        if (methodName.contains("(")) { //TODO throw exception?
+            methodName = methodName.split("\\(")[0];
+        }
         return methodName.split("By", 2)[1];
     }
 
@@ -67,20 +72,30 @@ public abstract class StatementCreator {
         var resList = new ColumnAttributeModel();
         List<String> classAttributes = new ArrayList<>();
         if (clazz != null) {
-            classAttributes = StringUtils.getAttributesFromClass(clazz);
-        }
-        for (String keyword : QueryPart.ALL_KEYWORDS) {
-            if (methodName.startsWith(keyword)) {
-                resList.queryPartsList.add(QueryPart.valueOf(keyword.toUpperCase()));
-                methodName = methodName.substring(keyword.length());
+            var attributes = StringUtils.getAttributesFromClass(clazz); //TODO hier weiter machen
+            for (var attribute : attributes) {
+                var modifiedAttribute = Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
+                classAttributes.add(modifiedAttribute);
             }
-            if (classAttributes != null) {
-                for (String column : classAttributes) {
-                    if (methodName.startsWith(column)) {
-                        resList.columnList.add(column);
-                        methodName = methodName.substring(column.length());
+        }
+        while (!methodName.isEmpty()) {
+            var oldMethod = methodName;
+            for (String keyword : QueryPart.ALL_KEYWORDS) {
+                if (methodName.startsWith(keyword)) {
+                    resList.queryPartsList.add(QueryPart.valueOf(keyword.toUpperCase()));
+                    methodName = methodName.substring(keyword.length());
+                }
+                if (classAttributes != null) {
+                    for (String column : classAttributes) {
+                        if (methodName.startsWith(column)) {
+                            resList.columnList.add(column);
+                            methodName = methodName.substring(column.length());
+                        }
                     }
                 }
+            }
+            if (oldMethod.equals(methodName)) {
+                throw new IllegalArgumentException("Method or Class Attribute not supported");
             }
         }
         return resList;
