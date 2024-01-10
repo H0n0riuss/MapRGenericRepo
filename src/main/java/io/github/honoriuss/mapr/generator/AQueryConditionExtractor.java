@@ -29,16 +29,15 @@ public abstract class AQueryConditionExtractor {
                     if (key.hasColumnName()) {
                         for (var column : columnsList) {
                             if (methodName.startsWith(column)) {
-                                key.columnName.add(column);
+                                key.columnNameList.add(column);
                                 methodName = methodName.substring(column.length());
                                 break;
                             }
                         }
                     }
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
-                        key.argumentList.add(argumentList.get(i + argumentIndex));
+                        key.argumentList.add(argumentList.get(argumentIndex++));
                     }
-                    argumentIndex += key.argumentList.size();
                     queryResult.eQueryPartList.add(key);
                 }
             }
@@ -49,16 +48,15 @@ public abstract class AQueryConditionExtractor {
                     if (key.hasColumnName()) {
                         for (var column : columnsList) {
                             if (methodName.startsWith(column)) {
-                                key.columnName.add(column);
+                                key.columnNameList.add(column);
                                 methodName = methodName.substring(column.length());
                                 break;
                             }
                         }
                     }
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
-                        key.argumentList.add(argumentList.get(i + argumentIndex));
+                        key.argumentList.add(argumentList.get(argumentIndex++));
                     }
-                    argumentIndex += key.argumentList.size();
                     queryResult.eConditionPartList.add(key);
                 }
             }
