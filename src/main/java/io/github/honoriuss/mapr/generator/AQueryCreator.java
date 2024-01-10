@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public abstract class StatementCreator {
-    public static CodeBlock createStatement(String methodName, List<String> attributeList) {
-        return createStatement(methodName, null, attributeList);
+public abstract class AQueryCreator {
+    public static CodeBlock createQueryStatement(String methodName, List<String> attributeList) {
+        return createQueryStatement(methodName, null, attributeList);
     }
 
-    public static CodeBlock createStatement(String methodName, Class<?> clazz, List<String> attributeList) {
+    public static CodeBlock createQueryStatement(String methodName, Class<?> clazz, List<String> attributeList) {
         var codeBlock = CodeBlock.builder();
         methodName = cutMethodName(methodName);
 
@@ -23,20 +23,20 @@ public abstract class StatementCreator {
         int attributesIndex = 0;
         int columnsIndex = 0;
 
-        if (queryParts.queryPartsList == null || queryParts.queryPartsList.isEmpty()) {
+        if (queryParts.EQueryPartsList == null || queryParts.EQueryPartsList.isEmpty()) {
             return null;
         }
 
-        for (QueryPart queryPart : queryParts.queryPartsList) {
+        for (EQueryPart EQueryPart : queryParts.EQueryPartsList) {
             var part = new StringBuilder();
             part.append(".")
-                    .append(queryPart.getTranslation())
+                    .append(EQueryPart.getTranslation())
                     .append("(");
-            for (int i = 0; i < queryPart.getNumberOfArguments(); ++i, ++attributesIndex) {
+            for (int i = 0; i < EQueryPart.getNumberOfArguments(); ++i, ++attributesIndex) {
                 if (attributeList == null || attributeList.size() < attributesIndex + i) {
                     throw new IllegalArgumentException("ClassList cant be null if argument needs an attribute");
                 }
-                if (queryPart.hasColumnName()) {
+                if (EQueryPart.hasColumnName()) {
                     if (queryParts.columnList == null || queryParts.columnList.size() < columnsIndex) {
                         throw new IllegalArgumentException("ColumnList cant be null if column is needed");
                     }
@@ -80,29 +80,27 @@ public abstract class StatementCreator {
         }
         while (!methodName.isEmpty()) {
             var oldMethod = methodName;
-            for (String keyword : QueryPart.ALL_KEYWORDS) {
+            for (String keyword : EQueryPart.ALL_KEYWORDS) {
                 if (methodName.startsWith(keyword)) {
-                    resList.queryPartsList.add(QueryPart.valueOf(keyword.toUpperCase()));
+                    resList.EQueryPartsList.add(EQueryPart.valueOf(keyword.toUpperCase()));
                     methodName = methodName.substring(keyword.length());
                 }
-                if (classAttributes != null) {
-                    for (String column : classAttributes) {
-                        if (methodName.startsWith(column)) {
-                            resList.columnList.add(column);
-                            methodName = methodName.substring(column.length());
-                        }
+                for (String column : classAttributes) {
+                    if (methodName.startsWith(column)) {
+                        resList.columnList.add(column);
+                        methodName = methodName.substring(column.length());
                     }
                 }
             }
             if (oldMethod.equals(methodName)) {
-                throw new IllegalArgumentException("Method or Class Attribute not supported");
+                throw new IllegalArgumentException(String.format("Method %s or Class Attribute not supported", methodName));
             }
         }
         return resList;
     }
 
     private static class ColumnAttributeModel {
-        public List<QueryPart> queryPartsList = new ArrayList<>();
+        public List<EQueryPart> EQueryPartsList = new ArrayList<>();
         public List<String> columnList = new ArrayList<>();
     }
 }

@@ -44,7 +44,7 @@ public abstract class MethodGenerator {
                 .addStatement(String.format("store.%s(%s)",
                         CrudDecider.getCrudTranslation(methodName),
                         parameterSpecs.get(0).name))
-                .addCode(StatementCreator.createStatement(methodName, argumentStringList))
+                .addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
                 .endControlFlow()
                 .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }
