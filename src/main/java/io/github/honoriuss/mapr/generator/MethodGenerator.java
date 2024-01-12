@@ -8,6 +8,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author H0n0riuss
@@ -26,13 +27,17 @@ public abstract class MethodGenerator {
     private static MethodSpec generateVoidMethod(ExecutableElement enclosedElement,
                                                  ProcessingEnvironment processingEnvironment,
                                                  ClassName entityClassName) {
-        var methodName = enclosedElement.getSimpleName().toString();
+        var methodName = enclosedElement.getSimpleName().toString(); //TODO cut after by and table name if there is something like findByText
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
 
         var argumentStringList = new ArrayList<String>();
         for (var argument : enclosedElement.getParameters()) {
             argumentStringList.add(argument.getSimpleName().toString());
         }
+        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
+
+        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList,
+                queryConditionModel.eConditionPartList);
 
         return MethodSpec.methodBuilder(
                         methodName)
@@ -41,7 +46,8 @@ public abstract class MethodGenerator {
                 .returns(void.class)
                 .addParameters(parameterSpecs)
                 .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
-                .addStatement(String.format("store.%s(%s)",
+                .addStatement(queryString)
+                .addStatement(String.format("store.%s(%s)", //TODO decide before use this because of query
                         CrudDecider.getCrudTranslation(methodName),
                         parameterSpecs.get(0).name))
                 .addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
@@ -65,5 +71,27 @@ public abstract class MethodGenerator {
 
     private static MethodSpec generateListTypeReturnMethod() {
         return null;
+    }
+
+    private static String createQueryConditionString(List<EQueryPart> eQueryPartList,
+                                                     List<EConditionPart> conditionPartList) {
+        if (eQueryPartList.isEmpty()) {
+            return "";
+        }
+        var res = "";
+        var hasCondition = !conditionPartList.isEmpty();
+
+        if (hasCondition) {
+            res += String.format("org.ojai.store.QueryCondition condition = connection.newCondition()%s",
+                    AQueryConditionCreator.createConditionCodeBlock(conditionPartList));
+            res += ".build();\n";
+        }
+
+        res += String.format("org.ojai.store.Query query = connection.newQuery()%s",
+                AQueryConditionCreator.createQueryCodeBlock(eQueryPartList));
+        if (hasCondition) {
+            res += ".where(condition)";
+        }
+        return res + ".build();";
     }
 }
