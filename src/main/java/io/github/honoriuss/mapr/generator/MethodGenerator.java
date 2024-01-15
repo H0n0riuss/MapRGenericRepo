@@ -34,10 +34,8 @@ public abstract class MethodGenerator {
         for (var argument : enclosedElement.getParameters()) {
             argumentStringList.add(argument.getSimpleName().toString());
         }
-        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
 
-        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList,
-                queryConditionModel.eConditionPartList);
+        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, true);
 
         return MethodSpec.methodBuilder(
                         methodName)
@@ -47,9 +45,6 @@ public abstract class MethodGenerator {
                 .addParameters(parameterSpecs)
                 .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
                 .addStatement(queryString)
-                .addStatement(String.format("store.%s(%s)", //TODO decide before use this because of query
-                        CrudDecider.getCrudTranslation(methodName),
-                        parameterSpecs.get(0).name))
                 .addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
                 .endControlFlow()
                 .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
@@ -94,4 +89,23 @@ public abstract class MethodGenerator {
         }
         return res + ".build();";
     }
+
+    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName, boolean isVoidMethod) {
+        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
+
+        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList,
+                queryConditionModel.eConditionPartList);
+
+        var resString = "";
+
+        switch (ACrudDecider.getCrudType(methodName)) {
+            case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, isVoidMethod);
+            case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.getClass().toString(), queryString, false);
+            case UPDATE -> resString = ACRUDQueryCreator.getUpdateString(argumentStringList);
+            case DELETE -> resString = ACRUDQueryCreator.getDeleteString(argumentStringList);
+        }
+
+        return resString;
+    }
+
 }
