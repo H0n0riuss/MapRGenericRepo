@@ -11,12 +11,23 @@ import java.util.List;
 public abstract class AQueryConditionExtractor {
     public static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, Class<?> clazz) {
         var queryResult = new QueryConditionModel();
+        if (methodName.isEmpty()) {
+            return queryResult;
+        }
         List<String> columnsList = new ArrayList<>();
         if (clazz != null) {
             var attributes = StringUtils.getAttributesFromClass(clazz); //TODO hier weiter machen
             for (var attribute : attributes) {
                 var modifiedAttribute = Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
                 columnsList.add(modifiedAttribute);
+            }
+        }
+        if (methodName.contains("By") && !methodName.contains("OrderBy")) {
+            var split = methodName.split("By", 2);
+            if (split.length >= 2) {
+                methodName = split[1];
+            } else {
+                methodName = split[0];
             }
         }
         var argumentIndex = 0;
@@ -61,7 +72,7 @@ public abstract class AQueryConditionExtractor {
                 }
             }
             if (oldMethod.equals(methodName)) {
-                throw new IllegalArgumentException("Method or Class Attribute not supported");
+                throw new IllegalArgumentException("Method or Class Attribute not supported: " + methodName);
             }
         }
         return queryResult;

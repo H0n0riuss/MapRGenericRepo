@@ -45,7 +45,7 @@ public abstract class MethodGenerator {
                 .addParameters(parameterSpecs)
                 .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
                 .addStatement(queryString)
-                .addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
+                //.addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
                 .endControlFlow()
                 .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }
@@ -57,7 +57,7 @@ public abstract class MethodGenerator {
             }
             //return generateReturnMethod(enclosedElement, ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName)); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
         }
-        return null;
+        return generateVoidMethod(enclosedElement, processingEnvironment, entityClassName);//TODO return the right method
     }
 
     private static MethodSpec generateReturnMethod() {
@@ -91,6 +91,14 @@ public abstract class MethodGenerator {
     }
 
     private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName, boolean isVoidMethod) {
+        var split = methodName.split("[A-Z]", 2);
+        var crud = ACrudDecider.getCrudType(methodName);
+        if (split.length >= 2) {
+            methodName = split[1];
+        } else {
+            methodName = "";
+        }
+
         var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
 
         var queryString = createQueryConditionString(queryConditionModel.eQueryPartList,
@@ -98,7 +106,7 @@ public abstract class MethodGenerator {
 
         var resString = "";
 
-        switch (ACrudDecider.getCrudType(methodName)) {
+        switch (crud) {
             case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, isVoidMethod);
             case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.getClass().toString(), queryString, false);
             case UPDATE -> resString = ACRUDQueryCreator.getUpdateString(argumentStringList);

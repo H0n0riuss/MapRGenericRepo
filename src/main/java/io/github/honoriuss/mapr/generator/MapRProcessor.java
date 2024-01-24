@@ -22,7 +22,7 @@ import java.util.Set;
  * @author H0n0riuss
  */
 @SupportedAnnotationTypes("io.github.honoriuss.mapr.generator.annotations.*")
-@AutoService(io.github.honoriuss.mapr.query.MapRProcessor.class)
+@AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {
     private String packageName;
     private ClassName entityClassName;
@@ -51,7 +51,7 @@ public class MapRProcessor extends AbstractProcessor {
         var entityTypeMirror = declaredType.getTypeArguments().get(0);
         this.entityClassName = ClassName.get((TypeElement) this.processingEnv.getTypeUtils().asElement(entityTypeMirror));
         this.interfaceElement = interfaceElement;
-        this.classBuilder = TypeSpec.classBuilder(interfaceElement.getSimpleName() + "Impl");
+        this.classBuilder = TypeSpec.classBuilder(interfaceElement.getSimpleName() + "ImplB");
     }
 
     private void generateImplementation() {
@@ -99,7 +99,6 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void implementMethods() {
-        // Generiere Implementierungen für jede Methode im Interface
         for (Element enclosedElement : this.interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
                 classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) enclosedElement, processingEnv, entityClassName));

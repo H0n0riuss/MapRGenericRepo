@@ -65,7 +65,11 @@ public abstract class AQueryCreator {
         if (methodName.contains("(")) { //TODO throw exception?
             methodName = methodName.split("\\(")[0];
         }
-        return methodName.split("By", 2)[1];
+        var split = methodName.split("By", 2);
+        if (split.length >= 2) {
+            return split[1];
+        }
+        return split[0];
     }
 
     private static ColumnAttributeModel extractQueryParts(String methodName, Class<?> clazz) {
