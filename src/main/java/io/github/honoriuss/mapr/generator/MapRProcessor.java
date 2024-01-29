@@ -3,7 +3,7 @@ package io.github.honoriuss.mapr.generator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.connections.OjaiConnector;
-import io.github.honoriuss.mapr.query.annotations.Repository;
+import io.github.honoriuss.mapr.generator.annotations.Repository;
 import org.ojai.store.Connection;
 import org.springframework.stereotype.Component;
 

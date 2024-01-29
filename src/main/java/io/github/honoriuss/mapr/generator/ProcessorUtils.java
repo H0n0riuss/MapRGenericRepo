@@ -7,6 +7,7 @@ import com.squareup.javapoet.TypeName;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,5 +39,9 @@ public abstract class ProcessorUtils {
 
     public static boolean isListType(Class<?> returnType) {
         return List.class.isAssignableFrom(returnType);
+    }
+
+    public static TypeName getClassType(TypeMirror returnClass) {
+        return TypeName.get(returnClass);
     }
 }

@@ -14,19 +14,50 @@ import java.util.List;
  * @author H0n0riuss
  */
 public abstract class MethodGenerator {
-    public static MethodSpec generateMethod(ExecutableElement enclosedElement,
-                                            ProcessingEnvironment processingEnvironment,
-                                            ClassName entityClassName) {
-        if (enclosedElement.getReturnType().toString().equals(void.class.toString())) {
-            return generateVoidMethod(enclosedElement, processingEnvironment, entityClassName);
-        } else {
-            return generateReturnMethod(enclosedElement, processingEnvironment, entityClassName);
+    public static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
+        var methodName = enclosedElement.getSimpleName().toString();
+        var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
+
+        var argumentStringList = new ArrayList<String>();
+        for (var argument : enclosedElement.getParameters()) {
+            argumentStringList.add(argument.getSimpleName().toString());
         }
+
+        var returnClass = enclosedElement.getReturnType();
+        var returnClassType = ProcessorUtils.getClassType(returnClass);
+        if (returnClassType.toString().equals("T")) {
+            returnClassType = entityClassName;
+        }
+
+        var hasReturnType = enclosedElement.getReturnType().toString().equals(void.class.toString());
+        var hasListReturnType = ProcessorUtils.isListType(returnClass.getClass());
+
+        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType);
+
+        return MethodSpec.methodBuilder(
+                        methodName)
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(returnClassType)
+                .addParameters(parameterSpecs)
+                .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
+                .addStatement(queryString)
+                .endControlFlow()
+                .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
     }
 
-    private static MethodSpec generateVoidMethod(ExecutableElement enclosedElement,
-                                                 ProcessingEnvironment processingEnvironment,
-                                                 ClassName entityClassName) {
+    private static MethodSpec generateReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
+        if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
+            if (ProcessorUtils.isListType(enclosedElement.getReturnType().getClass())) {
+                return generateGenericListTypeReturnMethod(enclosedElement, processingEnvironment, entityClassName);
+            }
+            return generateGenericListReturnMethod(enclosedElement, processingEnvironment, entityClassName);
+        }
+        if (ProcessorUtils.isListType(enclosedElement.getReturnType().getClass())) {
+            return generateListReturnMethod(enclosedElement, processingEnvironment, entityClassName);
+        }
+
+
         var methodName = enclosedElement.getSimpleName().toString(); //TODO cut after by and table name if there is something like findByText
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
 
@@ -35,8 +66,7 @@ public abstract class MethodGenerator {
             argumentStringList.add(argument.getSimpleName().toString());
         }
 
-        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, true);
-
+        var queryString = "";//getStoreQuery(methodName, argumentStringList, entityClassName, true);
         return MethodSpec.methodBuilder(
                         methodName)
                 .addAnnotation(Override.class)
@@ -47,29 +77,23 @@ public abstract class MethodGenerator {
                 .addStatement(queryString)
                 //.addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
                 .endControlFlow()
-                .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
+                .build();
     }
 
-    private static MethodSpec generateReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
-        if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
-            if (ProcessorUtils.isListType(enclosedElement.getReturnType().getClass())) {
-                return generateListTypeReturnMethod();
-            }
-            //return generateReturnMethod(enclosedElement, ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName)); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
-        }
-        return generateVoidMethod(enclosedElement, processingEnvironment, entityClassName);//TODO return the right method
-    }
-
-    private static MethodSpec generateReturnMethod() {
+    private static MethodSpec generateListReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
         return null;
     }
 
-    private static MethodSpec generateListTypeReturnMethod() {
+    private static MethodSpec generateGenericListReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
         return null;
     }
 
-    private static String createQueryConditionString(List<EQueryPart> eQueryPartList,
-                                                     List<EConditionPart> conditionPartList) {
+    private static MethodSpec generateGenericListTypeReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
+        return null;
+    }
+
+    private static String createQueryConditionString(List<EQueryPart> eQueryPartList, List<EConditionPart> conditionPartList,
+                                                     boolean hasReturnType, boolean hasListReturnType) {
         if (eQueryPartList.isEmpty()) {
             return "";
         }
@@ -90,8 +114,8 @@ public abstract class MethodGenerator {
         return res + ".build();";
     }
 
-    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName, boolean isVoidMethod) {
-        var split = methodName.split("[A-Z]", 2);
+    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName, boolean hasReturnType, boolean hasListReturnType) {
+        var split = methodName.split("By", 2);
         var crud = ACrudDecider.getCrudType(methodName);
         if (split.length >= 2) {
             methodName = split[1];
@@ -101,19 +125,27 @@ public abstract class MethodGenerator {
 
         var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
 
-        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList,
-                queryConditionModel.eConditionPartList);
+        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList, hasReturnType, hasListReturnType);
+
+        var findByIdArg = extractArgumentById(argumentStringList);
 
         var resString = "";
 
         switch (crud) {
-            case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, isVoidMethod);
-            case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.getClass().toString(), queryString, false);
+            case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, hasReturnType);
+            case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.simpleName(), queryString, hasListReturnType, findByIdArg);
             case UPDATE -> resString = ACRUDQueryCreator.getUpdateString(argumentStringList);
             case DELETE -> resString = ACRUDQueryCreator.getDeleteString(argumentStringList);
         }
 
         return resString;
+    }
+
+    private static String extractArgumentById(ArrayList<String> argumentStringList) {
+        if (argumentStringList.size() == 1 && argumentStringList.get(0).toLowerCase().contains("id")) {
+            return argumentStringList.get(0);
+        }
+        return "";
     }
 
 }
