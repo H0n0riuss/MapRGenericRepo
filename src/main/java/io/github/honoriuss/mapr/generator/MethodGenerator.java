@@ -43,57 +43,10 @@ public abstract class MethodGenerator {
                 .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
                 .addStatement(queryString)
                 .endControlFlow()
-                .build(); //TODO den Teil wahrscheinlich erst nach der Schleife machen, damit alles andere drinnen richtig erstellt wird
-    }
-
-    private static MethodSpec generateReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
-        if (enclosedElement.getReturnType().toString().equals("T")) { //TODO auslagern in den QueryCreator
-            if (ProcessorUtils.isListType(enclosedElement.getReturnType().getClass())) {
-                return generateGenericListTypeReturnMethod(enclosedElement, processingEnvironment, entityClassName);
-            }
-            return generateGenericListReturnMethod(enclosedElement, processingEnvironment, entityClassName);
-        }
-        if (ProcessorUtils.isListType(enclosedElement.getReturnType().getClass())) {
-            return generateListReturnMethod(enclosedElement, processingEnvironment, entityClassName);
-        }
-
-
-        var methodName = enclosedElement.getSimpleName().toString(); //TODO cut after by and table name if there is something like findByText
-        var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
-
-        var argumentStringList = new ArrayList<String>();
-        for (var argument : enclosedElement.getParameters()) {
-            argumentStringList.add(argument.getSimpleName().toString());
-        }
-
-        var queryString = "";//getStoreQuery(methodName, argumentStringList, entityClassName, true);
-        return MethodSpec.methodBuilder(
-                        methodName)
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
-                .addParameters(parameterSpecs)
-                .beginControlFlow("try ($T store = connection.getStore(dbPath)) ", DocumentStore.class)
-                .addStatement(queryString)
-                //.addCode(AQueryCreator.createQueryStatement(methodName, argumentStringList))
-                .endControlFlow()
                 .build();
     }
 
-    private static MethodSpec generateListReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
-        return null;
-    }
-
-    private static MethodSpec generateGenericListReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
-        return null;
-    }
-
-    private static MethodSpec generateGenericListTypeReturnMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
-        return null;
-    }
-
-    private static String createQueryConditionString(List<EQueryPart> eQueryPartList, List<EConditionPart> conditionPartList,
-                                                     boolean hasReturnType, boolean hasListReturnType) {
+    private static String createQueryConditionString(List<EQueryPart> eQueryPartList, List<EConditionPart> conditionPartList) {
         if (eQueryPartList.isEmpty()) {
             return "";
         }
@@ -124,20 +77,16 @@ public abstract class MethodGenerator {
         }
 
         var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
-
-        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList, hasReturnType, hasListReturnType);
-
+        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList);
         var findByIdArg = extractArgumentById(argumentStringList);
 
         var resString = "";
-
         switch (crud) {
             case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, hasReturnType);
             case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.simpleName(), queryString, hasListReturnType, findByIdArg);
             case UPDATE -> resString = ACRUDQueryCreator.getUpdateString(argumentStringList);
             case DELETE -> resString = ACRUDQueryCreator.getDeleteString(argumentStringList);
         }
-
         return resString;
     }
 
@@ -147,5 +96,4 @@ public abstract class MethodGenerator {
         }
         return "";
     }
-
 }
