@@ -6,7 +6,10 @@ import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +40,13 @@ public abstract class ProcessorUtils {
         return parameterSpecs;
     }
 
-    public static boolean isListType(Class<?> returnType) {
-        return List.class.isAssignableFrom(returnType);
+    public static boolean isListType(TypeMirror returnType) {
+        if (returnType.getKind() == TypeKind.DECLARED) {
+            DeclaredType declaredReturnType = (DeclaredType) returnType;
+            TypeElement returnElement = (TypeElement) declaredReturnType.asElement();
+            return returnElement.getQualifiedName().contentEquals(List.class.getName());
+        }
+        return false;
     }
 
     public static TypeName getClassType(TypeMirror returnClass) {

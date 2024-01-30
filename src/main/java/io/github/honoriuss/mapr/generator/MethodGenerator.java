@@ -30,7 +30,7 @@ public abstract class MethodGenerator {
         }
 
         var hasReturnType = enclosedElement.getReturnType().toString().equals(void.class.toString());
-        var hasListReturnType = ProcessorUtils.isListType(returnClass.getClass());
+        var hasListReturnType = ProcessorUtils.isListType(returnClass);
 
         var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType);
 

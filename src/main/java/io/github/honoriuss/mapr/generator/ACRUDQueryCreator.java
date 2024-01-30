@@ -27,15 +27,17 @@ public abstract class ACRUDQueryCreator { //TODO everything with many
         } else {
             res += "var queryResult = store.find();\n";
         }
+
         if (hasListReturnType) {
             res += String.format("var resList = new java.util.ArrayList<%s>();\n", entityClassName);
             res += String.format(
-                    "for(var entry : queryResult){\n" +
-                            "   resList.add(entry.toJavaBean(%s.class));\n" +
-                            "}\n", entityClassName);
+                    """
+                            for (var entry : queryResult) {
+                               resList.add(entry.toJavaBean(%s.class));
+                            }
+                            """, entityClassName);
             res += "return resList";
         } else {
-
             res += String.format("return queryResult.iterator().next().toJavaBean(%s.class)", entityClassName);
         }
         return res;
