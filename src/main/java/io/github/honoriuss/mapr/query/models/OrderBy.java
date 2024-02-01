@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class OrderBy {
     private static final Pattern ORDER_BY = Pattern.compile("(OrderBy|Order)");
     private static final Pattern DIRECTION = Pattern.compile("(ASC|DESC|Asc|Desc)");

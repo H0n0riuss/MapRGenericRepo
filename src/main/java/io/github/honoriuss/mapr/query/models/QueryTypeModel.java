@@ -9,6 +9,7 @@ import java.util.Optional;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class QueryTypeModel {
     private final EQueryType queryType;
     private final String columnName;

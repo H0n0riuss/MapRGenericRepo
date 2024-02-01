@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class Subject {
     private static final Pattern SAVE_PREFIX = Pattern.compile("^(save|insert|create)"); //TODO delete?
     private static final Pattern DELETE_PREFIX = Pattern.compile("^(remove|delete)");

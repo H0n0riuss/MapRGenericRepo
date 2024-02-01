@@ -10,6 +10,7 @@ import java.util.Optional;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class TypeArgs {
     private final ArrayList<TypeArgModel> typeArgModelList = new ArrayList<>();
 

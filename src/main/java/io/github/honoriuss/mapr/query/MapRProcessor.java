@@ -26,6 +26,7 @@ import java.util.Set;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 @SupportedAnnotationTypes("io.github.honoriuss.mapr.query.annotations.*")
 @AutoService(MapRProcessor.class)
 public class MapRProcessor extends AbstractProcessor {

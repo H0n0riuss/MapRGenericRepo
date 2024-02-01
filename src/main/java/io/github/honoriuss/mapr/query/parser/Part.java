@@ -8,6 +8,7 @@ import java.util.*;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class Part {
     private final Type type;
     private final List<String> properties;

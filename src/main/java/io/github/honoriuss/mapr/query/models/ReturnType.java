@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class ReturnType {
     private static final Pattern MODIFIER = Pattern.compile("(public|private|package)");
     private final boolean isListType; //TODO nötig?

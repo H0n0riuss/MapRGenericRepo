@@ -8,6 +8,7 @@ import java.util.Optional;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class Query {
     private final ReturnType returnType;
     private final Subject subject;

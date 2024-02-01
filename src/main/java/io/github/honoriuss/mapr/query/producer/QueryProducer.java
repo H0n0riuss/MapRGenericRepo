@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public abstract class QueryProducer {
     private static final Pattern SAVE_PREFIX = Pattern.compile("^(save|insert)");
     private static final Pattern DELETE_PREFIX = Pattern.compile("^(remove|delete)");

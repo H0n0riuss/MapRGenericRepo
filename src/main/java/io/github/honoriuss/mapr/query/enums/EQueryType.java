@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.query.enums;
 
 import java.util.*;
 
+@Deprecated
 public enum EQueryType {
     LIKE("like", "Like", "IsLike"),
     LIMIT("limit", false, "Limit", "IsLimit"),

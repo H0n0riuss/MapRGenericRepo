@@ -6,6 +6,7 @@ import io.github.honoriuss.mapr.utils.Assert;
 
 import java.util.List;
 
+@Deprecated
 public abstract class QueryParser {
     public static String createMethodCalls(Query query) {
         Assert.notNull(query, "Query cant be null");

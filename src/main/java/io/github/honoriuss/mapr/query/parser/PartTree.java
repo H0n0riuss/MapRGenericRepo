@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class PartTree {
     private static final Pattern PREFIX_TEMPLATE = Pattern.compile("^(save|find|read|get|query|search|stream|count|exists|delete|remove)((\\p{Lu}.*?))??By");
     private static final String SPLITTER = "(?=[A-Z])";

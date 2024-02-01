@@ -6,6 +6,7 @@ import io.github.honoriuss.mapr.utils.Assert;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class QueryCreator {
 
     public static Query getQuery(String interfaceMethod, Class<?> clazz) {

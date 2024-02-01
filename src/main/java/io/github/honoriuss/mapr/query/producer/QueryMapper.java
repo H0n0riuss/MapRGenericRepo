@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public abstract class QueryMapper {
     private static final Pattern ORDER_TYPE = Pattern.compile("(order|Order|orderBy|OrderBy)");
     private static final Pattern LIMIT_TYPE = Pattern.compile("(limit|Limit)");

@@ -10,6 +10,7 @@ import javax.lang.model.type.TypeMirror;
 /**
  * @author H0n0riuss
  */
+@Deprecated
 public class MetaInformation {
     public String generatedClassName;
     public String packageName;

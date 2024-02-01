@@ -15,6 +15,7 @@ import static io.github.honoriuss.mapr.query.parser.Part.Type.fromProperty;
  * <p>
  * Use queryPartModelList()
  */
+@Deprecated
 public class QueryPart {
     private final Pattern BY = Pattern.compile("By");
     private final List<String> queryPartStringList;
