@@ -17,8 +17,6 @@ public enum EConditionPart {
     private final int numberOfArguments;
     private final String translation;
     private final boolean hasColumnName;
-    public List<String> columnNameList = new ArrayList<>();
-    public List<String> argumentList = new ArrayList<>();
 
     public int getNumberOfArguments() {
         return this.numberOfArguments;

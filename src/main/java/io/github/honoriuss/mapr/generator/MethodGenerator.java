@@ -50,7 +50,7 @@ public abstract class MethodGenerator {
                 .build();
     }
 
-    private static String createQueryConditionString(List<EQueryPart> eQueryPartList, List<EConditionPart> conditionPartList) {
+    private static String createQueryConditionString(List<QueryModel> eQueryPartList, List<QueryModel> conditionPartList) {
         if (eQueryPartList.isEmpty()) {
             return "";
         }
@@ -71,7 +71,8 @@ public abstract class MethodGenerator {
         return res + ".build();\n";
     }
 
-    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
+    //TODO private again
+    public static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
                                         boolean hasReturnType, boolean hasListReturnType, List<String> attributeList) {
         var split = methodName.split("By", 2);
         var crud = ACrudDecider.getCrudType(methodName);
@@ -81,7 +82,7 @@ public abstract class MethodGenerator {
             methodName = "";
         }
 
-        QueryConditionModel queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, attributeList);
+        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, attributeList);
 
         var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList);
         var findByIdArg = extractArgumentById(argumentStringList);

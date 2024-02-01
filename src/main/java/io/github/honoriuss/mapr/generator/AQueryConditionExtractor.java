@@ -1,8 +1,5 @@
 package io.github.honoriuss.mapr.generator;
 
-import com.squareup.javapoet.ClassName;
-import io.github.honoriuss.mapr.utils.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,45 +30,45 @@ public abstract class AQueryConditionExtractor {
                 methodName = split[0];
             }
         }
-        var argumentIndex = 0;
         while (!methodName.isEmpty()) {
             var oldMethod = methodName;
             for (String keyword : EQueryPart.ALL_KEYWORDS) {
                 if (methodName.startsWith(keyword)) {
                     var key = EQueryPart.valueOf(keyword.toUpperCase());
+                    var model = new QueryModel(key.getTranslation(), key.hasColumnName());
                     methodName = methodName.substring(keyword.length());
                     if (key.hasColumnName()) {
                         for (var column : columnsList) {
                             if (methodName.startsWith(column)) {
-                                key.columnNameList.add(column);
+                                model.getColumnNameList().add(column);
                                 methodName = methodName.substring(column.length());
                                 break;
                             }
                         }
                     }
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
-                        key.argumentList.add(argumentList.get(argumentIndex++));
+                        model.getArgumentList().add(argumentList.remove(0));
                     }
-                    queryResult.eQueryPartList.add(key);
+                    queryResult.eQueryPartList.add(model);
                 }
             }
             for (String keyword : EConditionPart.ALL_KEYWORDS) {
                 if (methodName.startsWith(keyword)) {
                     var key = EConditionPart.valueOf(keyword.toUpperCase());
+                    var model = new QueryModel(key.getTranslation(), key.hasColumnName());
                     methodName = methodName.substring(keyword.length());
                     if (key.hasColumnName()) {
                         for (var column : columnsList) {
                             if (methodName.startsWith(column)) {
-                                key.columnNameList.add(column);
+                                model.getColumnNameList().add(column);
                                 methodName = methodName.substring(column.length());
-                                break;
                             }
                         }
                     }
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
-                        key.argumentList.add(argumentList.get(argumentIndex++));
+                        model.getArgumentList().add(argumentList.remove(0));
                     }
-                    queryResult.eConditionPartList.add(key);
+                    queryResult.eConditionPartList.add(model);
                 }
             }
             if (oldMethod.equals(methodName)) {

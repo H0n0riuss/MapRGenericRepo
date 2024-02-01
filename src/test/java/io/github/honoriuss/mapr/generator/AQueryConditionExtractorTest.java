@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class AQueryConditionExtractorTest {
     @Test
     public void extractionTest() {
         var methodName = "LikeTitleNotLikeTitleLimit";
-        var arguments = List.of("title", "notTitle", "limit");
+        var arguments = new ArrayList<>(Arrays.asList("title", "notTitle", "limit"));
         var classAttributes = new ArrayList<String>();
         classAttributes.add("title");
         var res = AQueryConditionExtractor.extractQueryCondition(methodName, arguments, classAttributes);

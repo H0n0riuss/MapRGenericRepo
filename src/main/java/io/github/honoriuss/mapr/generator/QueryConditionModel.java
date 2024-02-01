@@ -7,6 +7,6 @@ import java.util.List;
  * @author H0n0riuss
  */
 public class QueryConditionModel {
-    public List<EQueryPart> eQueryPartList = new ArrayList<>();
-    public List<EConditionPart> eConditionPartList = new ArrayList<>();
+    public List<QueryModel> eQueryPartList = new ArrayList<>();
+    public List<QueryModel> eConditionPartList = new ArrayList<>();
 }
