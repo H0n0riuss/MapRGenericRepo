@@ -9,15 +9,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author H0n0riuss
  */
-public abstract class MethodGenerator {
-    private final static Logger logger = Logger.getLogger(MethodGenerator.class.getName());
-
-    public static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment,
+abstract class MethodGenerator {
+    protected static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment,
                                             ClassName entityClassName, List<String> attributeList) {
         var methodName = enclosedElement.getSimpleName().toString();
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
@@ -71,8 +68,7 @@ public abstract class MethodGenerator {
         return res + ".build();\n";
     }
 
-    //TODO private again
-    public static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
+    protected static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
                                         boolean hasReturnType, boolean hasListReturnType, List<String> attributeList) {
         var split = methodName.split("By", 2);
         var crud = ACrudDecider.getCrudType(methodName);
@@ -84,7 +80,7 @@ public abstract class MethodGenerator {
 
         var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, attributeList);
 
-        var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList);
+        var queryString = createQueryConditionString(queryConditionModel.getQueryPartList(), queryConditionModel.getConditionPartList());
         var findByIdArg = extractArgumentById(argumentStringList);
 
         var resString = "";

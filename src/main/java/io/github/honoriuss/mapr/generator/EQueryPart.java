@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * @author H0n0riuss
  */
-public enum EQueryPart {
+enum EQueryPart {
     SELECT("select", false, "Select"),
     ORDERBY("orderBy", "OrderBy"),
     OFFSET("offset", "Offset"),

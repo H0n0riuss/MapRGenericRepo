@@ -25,8 +25,8 @@ public class AQueryConditionCreatorTest {
         var classAttributes = new ArrayList<String>();
         classAttributes.add("title");
         var queryCondition = AQueryConditionExtractor.extractQueryCondition(methodName, arguments, classAttributes);
-        var queryCodeBlock = AQueryConditionCreator.createQueryCodeBlock(queryCondition.eQueryPartList);
-        var conditionCodeBlock = AQueryConditionCreator.createConditionCodeBlock(queryCondition.eConditionPartList);
+        var queryCodeBlock = AQueryConditionCreator.createQueryCodeBlock(queryCondition.getQueryPartList());
+        var conditionCodeBlock = AQueryConditionCreator.createConditionCodeBlock(queryCondition.getConditionPartList());
         Assert.assertNotNull(queryCodeBlock);
         Assert.assertNotNull(conditionCodeBlock);
     }

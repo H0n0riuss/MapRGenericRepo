@@ -6,7 +6,16 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public class QueryConditionModel {
-    public List<QueryModel> eQueryPartList = new ArrayList<>();
-    public List<QueryModel> eConditionPartList = new ArrayList<>();
+class QueryConditionModel {
+    private List<QueryModel> eQueryPartList = new ArrayList<>();
+    private List<QueryModel> eConditionPartList = new ArrayList<>();
+
+    public List<QueryModel> getQueryPartList() {
+        return eQueryPartList;
+    }
+
+    public List<QueryModel> getConditionPartList() {
+        return eConditionPartList;
+    }
+
 }

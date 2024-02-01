@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 /**
  * @author H0n0riuss
  */
-public abstract class AQueryConditionExtractor {
+abstract class AQueryConditionExtractor {
     private final static Logger logger = Logger.getLogger(AQueryConditionExtractor.class.getName());
-    public static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, List<String> attributeList) {
+    protected static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, List<String> attributeList) {
         var queryResult = new QueryConditionModel();
         if (methodName.isEmpty()) {
             return queryResult;
@@ -49,7 +49,7 @@ public abstract class AQueryConditionExtractor {
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
                         model.getArgumentList().add(argumentList.remove(0));
                     }
-                    queryResult.eQueryPartList.add(model);
+                    queryResult.getQueryPartList().add(model);
                 }
             }
             for (String keyword : EConditionPart.ALL_KEYWORDS) {
@@ -68,7 +68,7 @@ public abstract class AQueryConditionExtractor {
                     for (int i = 0; i < key.getNumberOfArguments(); ++i) {
                         model.getArgumentList().add(argumentList.remove(0));
                     }
-                    queryResult.eConditionPartList.add(model);
+                    queryResult.getConditionPartList().add(model);
                 }
             }
             if (oldMethod.equals(methodName)) {

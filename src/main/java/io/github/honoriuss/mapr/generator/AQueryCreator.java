@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public abstract class AQueryCreator {
-    public static CodeBlock createQueryStatement(String methodName, List<String> attributeList) {
+abstract class AQueryCreator {
+    protected static CodeBlock createQueryStatement(String methodName, List<String> attributeList) {
         return createQueryStatement(methodName, null, attributeList);
     }
 
-    public static CodeBlock createQueryStatement(String methodName, Class<?> clazz, List<String> attributeList) {
+    protected static CodeBlock createQueryStatement(String methodName, Class<?> clazz, List<String> attributeList) {
         var codeBlock = CodeBlock.builder();
         methodName = cutMethodName(methodName);
 

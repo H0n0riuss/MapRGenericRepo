@@ -7,9 +7,9 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public abstract class AQueryConditionCreator {
+abstract class AQueryConditionCreator {
 
-    public static CodeBlock createConditionCodeBlock(List<QueryModel> eConditionParts) {
+    protected static CodeBlock createConditionCodeBlock(List<QueryModel> eConditionParts) {
         var codeBlock = CodeBlock.builder();
         for (var conditionPart : eConditionParts) {
             var part = new StringBuilder();
@@ -39,7 +39,7 @@ public abstract class AQueryConditionCreator {
         return codeBlock.build();
     }
 
-    public static CodeBlock createQueryCodeBlock(List<QueryModel> eQueryPartList) {
+    protected static CodeBlock createQueryCodeBlock(List<QueryModel> eQueryPartList) {
         var codeBlock = CodeBlock.builder();
         for (var queryPart : eQueryPartList) { //TODO Select as special condition?
             var part = new StringBuilder();

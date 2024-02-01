@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * @author H0n0riuss
  */
-public enum EConditionPart {
+enum EConditionPart {
     LIKE("like", "Like", "IsLike"),
     NOTLIKE("notLike", "NotLike", "IsNotLike"),
     AND("and", false, "And"),

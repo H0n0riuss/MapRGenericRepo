@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public class QueryModel {
+class QueryModel {
     private final String translation;
     private final boolean hasColumnName;
     private final List<String> columnNameList = new ArrayList<>();

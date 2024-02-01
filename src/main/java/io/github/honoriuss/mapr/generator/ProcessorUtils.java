@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-public abstract class ProcessorUtils {
-    public static List<ParameterSpec> getParameterSpecs(ExecutableElement enclosedElement,
+abstract class ProcessorUtils {
+    protected static List<ParameterSpec> getParameterSpecs(ExecutableElement enclosedElement,
                                                         ProcessingEnvironment processingEnvironment,
                                                         ClassName entityClassName) {
         List<ParameterSpec> parameterSpecs = new ArrayList<>(); //TODO refactor
@@ -40,7 +40,7 @@ public abstract class ProcessorUtils {
         return parameterSpecs;
     }
 
-    public static boolean isListType(TypeMirror returnType) {
+    protected static boolean isListType(TypeMirror returnType) {
         if (returnType.getKind() == TypeKind.DECLARED) {
             DeclaredType declaredReturnType = (DeclaredType) returnType;
             TypeElement returnElement = (TypeElement) declaredReturnType.asElement();
@@ -49,7 +49,7 @@ public abstract class ProcessorUtils {
         return false;
     }
 
-    public static TypeName getClassType(TypeMirror returnClass) {
+    protected static TypeName getClassType(TypeMirror returnClass) {
         return TypeName.get(returnClass);
     }
 }

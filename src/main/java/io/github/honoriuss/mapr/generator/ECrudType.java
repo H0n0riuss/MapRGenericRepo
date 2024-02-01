@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * @author H0n0riuss
  */
-public enum ECrudType {
+enum ECrudType {
     CREATE("insert", "create", "insert", "save"),
     READ("find", "read", "find", "get"),
     UPDATE("replace", "update", "replace"),

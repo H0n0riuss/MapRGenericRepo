@@ -5,9 +5,9 @@ import java.util.ArrayList;
 /**
  * @author H0n0riuss
  */
-public abstract class ACRUDQueryCreator { //TODO everything with many
+abstract class ACRUDQueryCreator { //TODO everything with many
 
-    public static String getCreateString(ArrayList<String> argumentStringList, boolean hasReturnType) {
+    protected static String getCreateString(ArrayList<String> argumentStringList, boolean hasReturnType) {
         var arg0 = argumentStringList.get(0);
         var res = arg0 + ".set_id(java.util.UUID.randomUUID().toString());\n";
         res += String.format("org.ojai.Document newDoc = connection.newDocument(%s);\n", arg0);
@@ -18,7 +18,7 @@ public abstract class ACRUDQueryCreator { //TODO everything with many
         return res;
     }
 
-    public static String getReadString(String entityClassName, String query, boolean hasListReturnType, String findByIdArg) {
+    protected static String getReadString(String entityClassName, String query, boolean hasListReturnType, String findByIdArg) {
         var res = query;
         if (!query.isEmpty()) {
             res += "var queryResult = store.find(query);\n";
@@ -43,7 +43,7 @@ public abstract class ACRUDQueryCreator { //TODO everything with many
         return res;
     }
 
-    public static String getUpdateString(ArrayList<String> argumentStringList) {
+    protected static String getUpdateString(ArrayList<String> argumentStringList) {
         var arg0 = argumentStringList.get(0);
         var resString = String.format("org.ojai.Document doc = connection.newDocument(%s);\n", arg0);
         resString += "store.replace(doc);\n";
@@ -51,7 +51,7 @@ public abstract class ACRUDQueryCreator { //TODO everything with many
         return resString;
     }
 
-    public static String getDeleteString(ArrayList<String> argumentStringList) { //TODO .checkAndDelete impl for query
+    protected static String getDeleteString(ArrayList<String> argumentStringList) { //TODO .checkAndDelete impl for query
         var arg0 = argumentStringList.get(0);
         return String.format("store.delete(%s)", arg0);
     }

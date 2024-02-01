@@ -23,7 +23,7 @@ public class AQueryConditionExtractorTest {
         classAttributes.add("title");
         var res = AQueryConditionExtractor.extractQueryCondition(methodName, arguments, classAttributes);
         Assert.assertNotNull(res);
-        Assert.assertEquals(2, res.eConditionPartList.size());
-        Assert.assertEquals(1, res.eQueryPartList.size());
+        Assert.assertEquals(2, res.getConditionPartList().size());
+        Assert.assertEquals(1, res.getQueryPartList().size());
     }
 }
