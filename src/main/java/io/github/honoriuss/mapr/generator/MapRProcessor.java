@@ -3,6 +3,7 @@ package io.github.honoriuss.mapr.generator;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.connections.OjaiConnector;
+import io.github.honoriuss.mapr.generator.annotations.Entity;
 import io.github.honoriuss.mapr.generator.annotations.Repository;
 import org.ojai.store.Connection;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,10 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author H0n0riuss
@@ -29,16 +32,30 @@ public class MapRProcessor extends AbstractProcessor {
     private List<? extends TypeMirror> extendsInterfaces;
     private TypeElement interfaceElement;
     private TypeSpec.Builder classBuilder;
+    private List<String> attributeList = new ArrayList<>(); //TODO consider convert in map with className and attributelist
+    private Logger logger = Logger.getLogger(MapRProcessor.class.getSimpleName());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        for (Element element : roundEnv.getElementsAnnotatedWith(Entity.class)) {
+            if (element.getKind() == ElementKind.CLASS) {
+                for (Element enclosedElement : element.getEnclosedElements()) {
+                    if (enclosedElement.getKind() == ElementKind.FIELD) {
+                        var variableElement = (VariableElement) enclosedElement;
+                        var attributeName = variableElement.getSimpleName().toString();
+                        attributeList.add(attributeName);
+                    }
+                }
+            } else {
+                logger.warning("Illegal use of Entity: " + element.getSimpleName().toString());
+            }
+        }
         for (Element element : roundEnv.getElementsAnnotatedWith(Repository.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
                 initProcessorAttributes((TypeElement) element);
                 generateImplementation();
             } else {
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-                        "Only interfaces can be annotated with @Repository", element);
+                logger.warning("Only interfaces can be annotated with @Repository: " + element.getSimpleName());
             }
         }
         return true;
@@ -57,7 +74,7 @@ public class MapRProcessor extends AbstractProcessor {
     private void generateImplementation() {
         prepareImplementation();
         implementHead();
-        implementAttributes();
+        implementMethodAttributes();
         implementConstructor();
         implementMethods();
         implementExtendsMethods();
@@ -78,7 +95,7 @@ public class MapRProcessor extends AbstractProcessor {
         }
     }
 
-    private void implementAttributes() {
+    private void implementMethodAttributes() {
         Repository repositoryAnnotation = interfaceElement.getAnnotation(Repository.class);
         classBuilder
                 .addField(FieldSpec
@@ -101,16 +118,17 @@ public class MapRProcessor extends AbstractProcessor {
     private void implementMethods() {
         for (Element enclosedElement : this.interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) enclosedElement, processingEnv, entityClassName));
+                classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) enclosedElement, processingEnv, entityClassName, attributeList));
             }
         }
     }
+
     private void implementExtendsMethods() {
         for (var t : this.extendsInterfaces) {
             if (t.getKind() == TypeKind.DECLARED) {
                 Element element = ((DeclaredType) t).asElement(); //TODO hier weiter machen
                 for (var e : element.getEnclosedElements()) {
-                    classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) e, processingEnv, entityClassName));
+                    classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) e, processingEnv, entityClassName, attributeList));
                 }
             }
         }

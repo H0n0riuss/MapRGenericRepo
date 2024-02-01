@@ -9,12 +9,16 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author H0n0riuss
  */
 public abstract class MethodGenerator {
-    public static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment, ClassName entityClassName) {
+    private final static Logger logger = Logger.getLogger(MethodGenerator.class.getName());
+
+    public static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment,
+                                            ClassName entityClassName, List<String> attributeList) {
         var methodName = enclosedElement.getSimpleName().toString();
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
 
@@ -32,7 +36,7 @@ public abstract class MethodGenerator {
         var hasReturnType = enclosedElement.getReturnType().toString().equals(void.class.toString());
         var hasListReturnType = ProcessorUtils.isListType(returnClass);
 
-        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType);
+        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
 
         return MethodSpec.methodBuilder(
                         methodName)
@@ -64,10 +68,11 @@ public abstract class MethodGenerator {
         if (hasCondition) {
             res += ".where(condition)";
         }
-        return res + ".build();";
+        return res + ".build();\n";
     }
 
-    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName, boolean hasReturnType, boolean hasListReturnType) {
+    private static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
+                                        boolean hasReturnType, boolean hasListReturnType, List<String> attributeList) {
         var split = methodName.split("By", 2);
         var crud = ACrudDecider.getCrudType(methodName);
         if (split.length >= 2) {
@@ -76,7 +81,8 @@ public abstract class MethodGenerator {
             methodName = "";
         }
 
-        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, entityClassName.getClass());
+        QueryConditionModel queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, attributeList);
+
         var queryString = createQueryConditionString(queryConditionModel.eQueryPartList, queryConditionModel.eConditionPartList);
         var findByIdArg = extractArgumentById(argumentStringList);
 

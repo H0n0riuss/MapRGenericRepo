@@ -1,24 +1,27 @@
 package io.github.honoriuss.mapr.generator;
 
+import com.squareup.javapoet.ClassName;
 import io.github.honoriuss.mapr.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author H0n0riuss
  */
 public abstract class AQueryConditionExtractor {
-    public static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, Class<?> clazz) {
+    private final static Logger logger = Logger.getLogger(AQueryConditionExtractor.class.getName());
+    public static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, List<String> attributeList) {
         var queryResult = new QueryConditionModel();
         if (methodName.isEmpty()) {
             return queryResult;
         }
         List<String> columnsList = new ArrayList<>();
-        if (clazz != null) {
-            var attributes = StringUtils.getAttributesFromClass(clazz); //TODO hier weiter machen
-            for (var attribute : attributes) {
+        if (attributeList != null) {
+            for (var attribute : attributeList) {
                 var modifiedAttribute = Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
+                logger.info(modifiedAttribute);
                 columnsList.add(modifiedAttribute);
             }
         }
