@@ -19,7 +19,8 @@ public abstract class AQueryConditionCreator {
             if (conditionPart.getHasColumnName()) {
                 for (var column : conditionPart.getColumnNameList()) {
                     part.append("\"")
-                            .append(column)
+                            .append(Character.toLowerCase(column.charAt(0)))
+                            .append(column.substring(1))
                             .append("\"")
                             .append(",");
                 }

@@ -1,13 +1,11 @@
 package io.github.honoriuss.mapr.generator;
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author H0n0riuss
