@@ -82,7 +82,7 @@ abstract class AMethodGenerator {
             var firstCol = StringUtils.getFirstColumnArgumentInMethodName(methodName, classAttributeList);
             if (firstCol.isPresent()) {
                 if (methodName.toLowerCase().startsWith(firstCol.get().toLowerCase())) {
-                    methodName = "Equals" + methodName;
+                    methodName = "Like" + methodName;
                 }
             }
         }
