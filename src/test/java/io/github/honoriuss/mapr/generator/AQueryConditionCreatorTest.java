@@ -52,7 +52,7 @@ public class AQueryConditionCreatorTest {
         var entityClassName = ClassName.get(TestClass.class);
         var hasReturnType = true;
         var hasListReturnType = true;
-        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class);
         var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
     }
@@ -64,12 +64,13 @@ public class AQueryConditionCreatorTest {
         var entityClassName = ClassName.get(TestClass.class);
         var hasReturnType = true;
         var hasListReturnType = false;
-        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class);
         var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
-        var shouldContain = "org.ojai.store.Query query = connection.newQuery().build();\n" +
-                "var queryResult = store.find(query);\n" +
-                "return queryResult.iterator().next().toJavaBean(TestClass.class)";
+        var shouldContain = """
+                org.ojai.store.Query query = connection.newQuery().build();
+                var queryResult = store.find(query);
+                return queryResult.iterator().next().toJavaBean(TestClass.class)""";
         Assert.assertEquals(shouldContain, query);
     }
 
@@ -80,7 +81,7 @@ public class AQueryConditionCreatorTest {
         var entityClassName = ClassName.get(TestClass.class);
         var hasReturnType = true;
         var hasListReturnType = false;
-        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class);
         var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
         var shouldContain = String.format("return store.findById(id).toJavaBean(%s.class)", entityClassName.simpleName());
@@ -94,13 +95,14 @@ public class AQueryConditionCreatorTest {
         var entityClassName = ClassName.get(TestClass.class);
         var hasReturnType = true;
         var hasListReturnType = false;
-        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class);
         var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
-        var shouldContain = String.format("org.ojai.store.QueryCondition condition = connection.newCondition().equals(\"title\",rui).build();\n" +
-                "org.ojai.store.Query query = connection.newQuery().where(condition).build();\n" +
-                "var queryResult = store.find(query);\n" +
-                "return queryResult.iterator().next().toJavaBean(TestClass.class)", entityClassName.simpleName());
+        var shouldContain = """
+                org.ojai.store.QueryCondition condition = connection.newCondition().equals("title",rui).build();
+                org.ojai.store.Query query = connection.newQuery().where(condition).build();
+                var queryResult = store.find(query);
+                return queryResult.iterator().next().toJavaBean(TestClass.class)""";
         Assert.assertEquals(shouldContain, query);
     }
 }
