@@ -99,7 +99,7 @@ public class AQueryConditionCreatorTest {
         var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
         var shouldContain = """
-                org.ojai.store.QueryCondition condition = connection.newCondition().equals("title",rui).build();
+                org.ojai.store.QueryCondition condition = connection.newCondition().like("title",rui).build();
                 org.ojai.store.Query query = connection.newQuery().where(condition).build();
                 var queryResult = store.find(query);
                 return queryResult.iterator().next().toJavaBean(TestClass.class)""";
