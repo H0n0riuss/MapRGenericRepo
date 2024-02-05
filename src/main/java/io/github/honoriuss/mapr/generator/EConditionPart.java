@@ -6,13 +6,15 @@ import java.util.*;
  * @author H0n0riuss
  */
 enum EConditionPart {
+    ID("_id", "_id", "Id", "ID", "id"),
     LIKE("like", "Like", "IsLike"),
+    EQUALS("equals", "Equals", "IsEqual", "IsEqualTo"),
     NOTLIKE("notLike", "NotLike", "IsNotLike"),
     AND("and", false, "And"),
     OR("or", false, "Or");
 
     public static final Collection<String> ALL_KEYWORDS;
-    private static final List<EConditionPart> ALL = List.of(LIKE, NOTLIKE, AND, OR);
+    private static final List<EConditionPart> ALL = List.of(ID, LIKE, EQUALS, NOTLIKE, AND, OR);
     private final List<String> keywords;
     private final int numberOfArguments;
     private final String translation;

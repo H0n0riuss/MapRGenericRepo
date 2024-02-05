@@ -32,8 +32,8 @@ public class MapRProcessor extends AbstractProcessor {
     private List<? extends TypeMirror> extendsInterfaces;
     private TypeElement interfaceElement;
     private TypeSpec.Builder classBuilder;
-    private List<String> attributeList = new ArrayList<>(); //TODO consider convert in map with className and attributelist
-    private Logger logger = Logger.getLogger(MapRProcessor.class.getSimpleName());
+    private final List<String> classAttributeList = new ArrayList<>(); //TODO consider convert in map with className and attributelist
+    private final Logger logger = Logger.getLogger(MapRProcessor.class.getSimpleName());
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -43,7 +43,7 @@ public class MapRProcessor extends AbstractProcessor {
                     if (enclosedElement.getKind() == ElementKind.FIELD) {
                         var variableElement = (VariableElement) enclosedElement;
                         var attributeName = variableElement.getSimpleName().toString();
-                        attributeList.add(attributeName);
+                        classAttributeList.add(attributeName);
                     }
                 }
             } else {
@@ -118,7 +118,7 @@ public class MapRProcessor extends AbstractProcessor {
     private void implementMethods() {
         for (Element enclosedElement : this.interfaceElement.getEnclosedElements()) {
             if (enclosedElement.getKind() == ElementKind.METHOD) {
-                classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) enclosedElement, processingEnv, entityClassName, attributeList));
+                classBuilder.addMethod(AMethodGenerator.generateMethod((ExecutableElement) enclosedElement, processingEnv, entityClassName, classAttributeList));
             }
         }
     }
@@ -128,7 +128,7 @@ public class MapRProcessor extends AbstractProcessor {
             if (t.getKind() == TypeKind.DECLARED) {
                 Element element = ((DeclaredType) t).asElement(); //TODO hier weiter machen
                 for (var e : element.getEnclosedElements()) {
-                    classBuilder.addMethod(MethodGenerator.generateMethod((ExecutableElement) e, processingEnv, entityClassName, attributeList));
+                    classBuilder.addMethod(AMethodGenerator.generateMethod((ExecutableElement) e, processingEnv, entityClassName, classAttributeList));
                 }
             }
         }

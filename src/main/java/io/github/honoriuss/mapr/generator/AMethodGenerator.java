@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.generator;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import io.github.honoriuss.mapr.utils.StringUtils;
 import org.ojai.store.DocumentStore;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -13,9 +14,9 @@ import java.util.List;
 /**
  * @author H0n0riuss
  */
-abstract class MethodGenerator {
+abstract class AMethodGenerator {
     protected static MethodSpec generateMethod(ExecutableElement enclosedElement, ProcessingEnvironment processingEnvironment,
-                                            ClassName entityClassName, List<String> attributeList) {
+                                               ClassName entityClassName, List<String> classAttributeList) {
         var methodName = enclosedElement.getSimpleName().toString();
         var parameterSpecs = ProcessorUtils.getParameterSpecs(enclosedElement, processingEnvironment, entityClassName);
 
@@ -33,7 +34,7 @@ abstract class MethodGenerator {
         var hasReturnType = enclosedElement.getReturnType().toString().equals(void.class.toString());
         var hasListReturnType = ProcessorUtils.isListType(returnClass);
 
-        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        var queryString = getStoreQuery(methodName, argumentStringList, entityClassName, hasReturnType, hasListReturnType, classAttributeList);
 
         return MethodSpec.methodBuilder(
                         methodName)
@@ -48,9 +49,6 @@ abstract class MethodGenerator {
     }
 
     private static String createQueryConditionString(List<QueryModel> eQueryPartList, List<QueryModel> conditionPartList) {
-        if (eQueryPartList.isEmpty()) {
-            return "";
-        }
         var res = "";
         var hasCondition = !conditionPartList.isEmpty();
 
@@ -59,7 +57,6 @@ abstract class MethodGenerator {
                     AQueryConditionCreator.createConditionCodeBlock(conditionPartList));
             res += ".build();\n";
         }
-
         res += String.format("org.ojai.store.Query query = connection.newQuery()%s",
                 AQueryConditionCreator.createQueryCodeBlock(eQueryPartList));
         if (hasCondition) {
@@ -69,7 +66,7 @@ abstract class MethodGenerator {
     }
 
     protected static String getStoreQuery(String methodName, ArrayList<String> argumentStringList, ClassName entityClassName,
-                                        boolean hasReturnType, boolean hasListReturnType, List<String> attributeList) {
+                                          boolean hasReturnType, boolean hasListReturnType, List<String> classAttributeList) {
         var split = methodName.split("By", 2);
         var crud = ACrudDecider.getCrudType(methodName);
         if (split.length >= 2) {
@@ -78,23 +75,32 @@ abstract class MethodGenerator {
             methodName = "";
         }
 
-        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, attributeList);
+        if (crud == ECrudType.READ) {
+            if (methodName.toLowerCase().startsWith("id")) { //TODO add other conditions etc.
+                return String.format("return store.findById(%s).toJavaBean(%s.class)", argumentStringList.get(0), entityClassName.simpleName());
+            }
+            var firstCol = StringUtils.getFirstColumnArgumentInMethodName(methodName, classAttributeList);
+            if (firstCol.isPresent()) {
+                if (methodName.toLowerCase().startsWith(firstCol.get().toLowerCase())) {
+                    methodName = "Equals" + methodName;
+                }
+            }
+        }
+
+        var queryConditionModel = AQueryConditionExtractor.extractQueryCondition(methodName, argumentStringList, classAttributeList);
 
         var queryString = createQueryConditionString(queryConditionModel.getQueryPartList(), queryConditionModel.getConditionPartList());
-        var findByIdArg = extractArgumentById(argumentStringList);
 
-        var resString = "";
-        switch (crud) {
-            case CREATE -> resString = ACRUDQueryCreator.getCreateString(argumentStringList, hasReturnType);
-            case READ -> resString = ACRUDQueryCreator.getReadString(entityClassName.simpleName(), queryString, hasListReturnType, findByIdArg);
-            case UPDATE -> resString = ACRUDQueryCreator.getUpdateString(argumentStringList);
-            case DELETE -> resString = ACRUDQueryCreator.getDeleteString(argumentStringList);
-        }
-        return resString;
+        return switch (crud) {
+            case CREATE -> ACRUDQueryCreator.getCreateString(argumentStringList, hasReturnType);
+            case READ -> ACRUDQueryCreator.getReadString(entityClassName.simpleName(), queryString, hasListReturnType);
+            case UPDATE -> ACRUDQueryCreator.getUpdateString(argumentStringList);
+            case DELETE -> ACRUDQueryCreator.getDeleteString(argumentStringList);
+        };
     }
 
-    private static String extractArgumentById(ArrayList<String> argumentStringList) {
-        if (argumentStringList.size() == 1 && argumentStringList.get(0).toLowerCase().contains("id")) {
+    private static String extractArgumentFirstArg(ArrayList<String> argumentStringList) {
+        if (!argumentStringList.isEmpty() && argumentStringList.get(0).toLowerCase().contains("id") && argumentStringList.size() == 1) {
             return argumentStringList.get(0);
         }
         return "";

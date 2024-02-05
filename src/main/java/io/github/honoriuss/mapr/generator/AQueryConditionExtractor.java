@@ -2,13 +2,11 @@ package io.github.honoriuss.mapr.generator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author H0n0riuss
  */
 abstract class AQueryConditionExtractor {
-    private final static Logger logger = Logger.getLogger(AQueryConditionExtractor.class.getName());
     protected static QueryConditionModel extractQueryCondition(String methodName, List<String> argumentList, List<String> attributeList) {
         var queryResult = new QueryConditionModel();
         if (methodName.isEmpty()) {
@@ -18,7 +16,6 @@ abstract class AQueryConditionExtractor {
         if (attributeList != null) {
             for (var attribute : attributeList) {
                 var modifiedAttribute = Character.toUpperCase(attribute.charAt(0)) + attribute.substring(1);
-                logger.info(modifiedAttribute);
                 columnsList.add(modifiedAttribute);
             }
         }

@@ -3,17 +3,12 @@ package io.github.honoriuss.mapr.utils;
 import oadd.org.apache.commons.lang3.reflect.FieldUtils;
 
 import javax.annotation.Nullable;
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -72,44 +67,26 @@ public abstract class StringUtils {
 
         return Arrays.stream(clazz.getDeclaredFields())
                 .map(Field::getName)
-
                 .collect(Collectors.toList());
     }
 
-    public static List<String> getAttributesFromClass(String clazzName) {
-        Assert.notNull(clazzName, "ClassName cant be null");
-        try {
-            Class<?> clazz = Class.forName(clazzName);
-            return FieldUtils.getAllFieldsList(clazz)
-                    .stream()
-                    .map(Field::getName)
-                    .collect(Collectors.toList());
-        } catch (ClassNotFoundException cnfe) {
-            Logger.getLogger(StringUtils.class.getSimpleName()).warning(String.format("Cant create Class.forName: %s", clazzName));
+    public static Optional<String> getFirstColumnArgumentInMethodName(String methodName, List<String> argumentList) {
+        if (methodName == null || argumentList == null || argumentList.isEmpty()) {
+            return Optional.empty();
         }
-        return null;
+        return argumentList.stream()
+                .filter(part -> methodName.toLowerCase().startsWith(part.toLowerCase()))
+                .max(Comparator.comparingInt(String::length));
     }
 
-    private static void printPath(String absolutePath) {
-        File directory = new File(absolutePath);
-
-        // Überprüfe, ob das Verzeichnis existiert und ob es sich um ein Verzeichnis handelt
-        if (directory.exists() && directory.isDirectory()) {
-            // Listet alle Dateien im Verzeichnis auf
-            File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    Logger.getLogger(StringUtils.class.getSimpleName()).info(file.getName());
-
-                    //Logger.getLogger(StringUtils.class.getSimpleName()).info("Das Verzeichnis existiert nicht oder ist kein Verzeichnis.");
-                }
-
-            }else{
-                Logger.getLogger(StringUtils.class.getSimpleName()).info("Das Verzeichnis existiert nicht oder ist kein Verzeichnis.");
-            }
+    public static String cutFirstColumnArgumentInMethodName(String methodName, List<String> argumentList) {
+        var opt = getFirstColumnArgumentInMethodName(methodName, argumentList);
+        if (opt.isEmpty()) {
+            return "";
         }
-        else{
-            Logger.getLogger(StringUtils.class.getSimpleName()).info("Das Verzeichnis existiert nicht oder ist kein Verzeichnis.");
+        if (methodName.startsWith(opt.get())) {
+            methodName = methodName.substring(opt.get().length());
         }
+        return methodName;
     }
 }

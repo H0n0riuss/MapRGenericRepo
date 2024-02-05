@@ -18,12 +18,10 @@ abstract class ACRUDQueryCreator { //TODO everything with many
         return res;
     }
 
-    protected static String getReadString(String entityClassName, String query, boolean hasListReturnType, String findByIdArg) {
+    protected static String getReadString(String entityClassName, String query, boolean hasListReturnType) {
         var res = query;
         if (!query.isEmpty()) {
             res += "var queryResult = store.find(query);\n";
-        } else if (!findByIdArg.isEmpty()) {
-            res += String.format("var queryResult = store.find(%s);\n", findByIdArg);
         } else {
             res += "var queryResult = store.find();\n";
         }

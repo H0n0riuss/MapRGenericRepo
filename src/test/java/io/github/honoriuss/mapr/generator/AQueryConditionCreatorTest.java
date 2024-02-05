@@ -1,11 +1,13 @@
 package io.github.honoriuss.mapr.generator;
 
 import com.squareup.javapoet.ClassName;
+import io.github.honoriuss.mapr.utils.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author H0n0riuss
@@ -38,8 +40,67 @@ public class AQueryConditionCreatorTest {
         var entityClassName = ClassName.get(TestClass.class);
         var hasReturnType = true;
         var hasListReturnType = true;
-        var attributeList = new ArrayList<>(Arrays.asList("name", "limit", "limit2", "entityName"));
-        var query = MethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class);
+        var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
         Assert.assertNotNull(query);
+    }
+
+    @Test
+    public void getStoreQueryTest(){
+        var method = "findByEntityName";
+        var argumentStringList = new ArrayList<>(List.of("entityName"));
+        var entityClassName = ClassName.get(TestClass.class);
+        var hasReturnType = true;
+        var hasListReturnType = true;
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        Assert.assertNotNull(query);
+    }
+
+    @Test
+    public void getStoreQuerySpecialIdTest(){
+        var method = "find";
+        var argumentStringList = new ArrayList<>(List.of("id"));
+        var entityClassName = ClassName.get(TestClass.class);
+        var hasReturnType = true;
+        var hasListReturnType = false;
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        Assert.assertNotNull(query);
+        var shouldContain = "org.ojai.store.Query query = connection.newQuery().build();\n" +
+                "var queryResult = store.find(query);\n" +
+                "return queryResult.iterator().next().toJavaBean(TestClass.class)";
+        Assert.assertEquals(shouldContain, query);
+    }
+
+    @Test
+    public void getStoreQuerySpecialIdTest2(){
+        var method = "findById";
+        var argumentStringList = new ArrayList<>(List.of("id"));
+        var entityClassName = ClassName.get(TestClass.class);
+        var hasReturnType = true;
+        var hasListReturnType = false;
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        Assert.assertNotNull(query);
+        var shouldContain = String.format("return store.findById(id).toJavaBean(%s.class)", entityClassName.simpleName());
+        Assert.assertEquals(shouldContain, query);
+    }
+
+    @Test
+    public void getStoreQuerySpecialIdTest3(){
+        var method = "findByTitle";
+        var argumentStringList = new ArrayList<>(List.of("rui"));
+        var entityClassName = ClassName.get(TestClass.class);
+        var hasReturnType = true;
+        var hasListReturnType = false;
+        var attributeList = StringUtils.getAttributesFromClass(TestClass.class); //TODO remove this in getStoreQuery?
+        var query = AMethodGenerator.getStoreQuery(method, argumentStringList, entityClassName, hasReturnType, hasListReturnType, attributeList);
+        Assert.assertNotNull(query);
+        var shouldContain = String.format("org.ojai.store.QueryCondition condition = connection.newCondition().equals(\"title\",rui).build();\n" +
+                "org.ojai.store.Query query = connection.newQuery().where(condition).build();\n" +
+                "var queryResult = store.find(query);\n" +
+                "return queryResult.iterator().next().toJavaBean(TestClass.class)", entityClassName.simpleName());
+        Assert.assertEquals(shouldContain, query);
     }
 }
