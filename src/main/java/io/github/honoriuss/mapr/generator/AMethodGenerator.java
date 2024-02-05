@@ -98,11 +98,4 @@ abstract class AMethodGenerator {
             case DELETE -> ACRUDQueryCreator.getDeleteString(argumentStringList);
         };
     }
-
-    private static String extractArgumentFirstArg(ArrayList<String> argumentStringList) {
-        if (!argumentStringList.isEmpty() && argumentStringList.get(0).toLowerCase().contains("id") && argumentStringList.size() == 1) {
-            return argumentStringList.get(0);
-        }
-        return "";
-    }
 }
