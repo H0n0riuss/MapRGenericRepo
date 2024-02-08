@@ -71,6 +71,10 @@ public abstract class MapRFSAdapter {
         return fileStatusList;
     }
 
+    public static FileStatus getFileStatus(Path fullPath) throws IOException{
+        return getFs().getFileStatus(fullPath);
+    }
+
     public static FileSystem getFs() throws IOException {
         Configuration config = new Configuration();
         return FileSystem.get(config);
