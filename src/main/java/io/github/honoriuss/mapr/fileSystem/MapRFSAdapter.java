@@ -62,7 +62,7 @@ public abstract class MapRFSAdapter {
             }
 
             if (fileStatus.isDirectory()) {
-                fileStatusList.addAll(getFileStatusList(fileStatus.getPath()));
+                fileStatusList.addAll(getFileStatusList(fileStatus.getPath(), ignoredRegexList));
             } else {
                 fileStatusList.add(fileStatus);
             }
