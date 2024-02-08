@@ -6,7 +6,7 @@
 
     <groupId>io.github.H0n0riuss</groupId>
     <artifactId>MapRGenericRepo</artifactId>
-    <version>0.3.2</version>
+    <version>0.4.1</version>
 
 
     <name>MapRGenericRepo</name>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>2.7.16</version>
+            <version>3.1.4</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
