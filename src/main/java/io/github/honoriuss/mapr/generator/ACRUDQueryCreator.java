@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 abstract class ACRUDQueryCreator { //TODO everything with many
 
-    protected static String getCreateString(ArrayList<String> argumentStringList, boolean hasReturnType) {
+    protected static String getCreateString(ArrayList<String> argumentStringList, boolean hasReturnType) {//TODO List
         var arg0 = argumentStringList.get(0);
         var res = arg0 + ".set_id(java.util.UUID.randomUUID().toString());\n";
         res += String.format("org.ojai.Document newDoc = connection.newDocument(%s);\n", arg0);

@@ -1,19 +1,10 @@
 package io.github.honoriuss.mapr.connections.models;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
-public class MapRConfig {
-    @Value("${mapr.drill.connection.jdbc.hosts}")
+public abstract class MapRConfig {
     private String[] hosts;
-    @Value("${mapr.drill.connection.jdbc.clusterName}")
     private String clusterName;
-    @Value("${mapr.drill.connection.jdbc.port}")
     private String port;
-    @Value("${mapr.drill.connection.jdbc.driver}")
     private String driver;
-    @Value("${mapr.drill.connection.jdbc.connection_pattern}")
     private String connectionPattern;
 
     public String[] getHosts() {
