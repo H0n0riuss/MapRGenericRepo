@@ -8,7 +8,7 @@ import org.junit.Test;
  */
 public class TableBaseModelTest {
     @Test
-    public void toJsonTest(){
+    public void toJsonTest() {
         var tableBaseModel = new TableBaseModel();
         tableBaseModel.setTableName("Hello World");
         var res = tableBaseModel.toJson();

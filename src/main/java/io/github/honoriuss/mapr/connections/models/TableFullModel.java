@@ -9,7 +9,7 @@ public class TableFullModel extends TableBaseModel {
     @JsonProperty("columns")
     private TableColumnsModel[] tableColumnsModels;
     @JsonProperty("permissions")
-    private TablePermissionModel tablePermissionModel;
+    private PermissionModel permissionModel;
 
     public TableColumnsModel[] getTableColumnsModels() {
         return tableColumnsModels;
@@ -19,11 +19,11 @@ public class TableFullModel extends TableBaseModel {
         this.tableColumnsModels = tableColumnsModels;
     }
 
-    public TablePermissionModel getTablePermissionModel() {
-        return tablePermissionModel;
+    public PermissionModel getPermissionModel() {
+        return permissionModel;
     }
 
-    public void setTablePermissionModel(TablePermissionModel tablePermissionModel) {
-        this.tablePermissionModel = tablePermissionModel;
+    public void setPermissionModel(PermissionModel permissionModel) {
+        this.permissionModel = permissionModel;
     }
 }

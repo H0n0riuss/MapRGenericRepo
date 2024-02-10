@@ -8,14 +8,14 @@ import org.junit.Test;
  */
 public class TableFullModelTest {
     @Test
-    public void toJsonTest(){
+    public void toJsonTest() {
         var tableFullModel = new TableFullModel();
         tableFullModel.setTableName("Hello World");
-        var permissions = new TablePermissionModel();
+        var permissions = new PermissionModel();
         permissions.setOwner("user1");
         permissions.setGroup("group1");
         permissions.setOther("none");
-        tableFullModel.setTablePermissionModel(permissions);
+        tableFullModel.setPermissionModel(permissions);
         var res = tableFullModel.toJson();
         var expected = "{\"name\":\"Hello World\",\"columns\":null,\"permissions\":{\"owner\":\"user1\",\"group\":\"group1\",\"other\":\"none\"}}";
         Assert.assertEquals(expected, res);
@@ -27,11 +27,11 @@ public class TableFullModelTest {
         tableFullModel.setTableName("Hello World");
         tableFullModel.setTableColumnsModels(new TableColumnsModel[3]);
 
-        var permissions = new TablePermissionModel();
+        var permissions = new PermissionModel();
         permissions.setOwner("user1");
         permissions.setGroup("group1");
         permissions.setOther("none");
-        tableFullModel.setTablePermissionModel(permissions);
+        tableFullModel.setPermissionModel(permissions);
 
         var column1 = new TableColumnsModel();
         column1.setColumnName("column1");

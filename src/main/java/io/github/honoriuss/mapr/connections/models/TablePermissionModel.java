@@ -5,35 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author H0n0riuss
  */
-public class TablePermissionModel {
-    @JsonProperty("owner")
-    private String owner;
-    @JsonProperty("group")
-    private String group;
-    @JsonProperty("other")
-    private String other;
+public class TablePermissionModel extends TableBaseModel {
+    @JsonProperty("permissions")
+    private PermissionModel permissionModel;
 
-    public String getOwner() {
-        return owner;
+    public PermissionModel getPermissionModel() {
+        return permissionModel;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
-    public String getOther() {
-        return other;
-    }
-
-    public void setOther(String other) {
-        this.other = other;
+    public void setPermissionModel(PermissionModel permissionModel) {
+        this.permissionModel = permissionModel;
     }
 }
