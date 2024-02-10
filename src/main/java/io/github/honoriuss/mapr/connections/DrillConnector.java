@@ -3,12 +3,14 @@ package io.github.honoriuss.mapr.connections;
 import io.github.honoriuss.mapr.connections.models.MapRConfig;
 import io.github.honoriuss.mapr.connections.query.DrillResult;
 import io.github.honoriuss.mapr.utils.StringUtils;
+import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class DrillConnector {
+@Service
+public class DrillConnector {
     private final MapRConfig mapRConfig;
     private Connection connection;
     private String drillUrl;

@@ -2,8 +2,10 @@ package io.github.honoriuss.mapr.connections;
 
 import org.ojai.store.Connection;
 import org.ojai.store.DriverManager;
+import org.springframework.stereotype.Service;
 
-public abstract class OjaiConnector {
+@Service
+public class OjaiConnector {
     private String url;
     private Connection connection;
 

@@ -2,10 +2,12 @@ mapr:
   drill:
     connection:
       jdbc:
-        hosts: host1,host2
-        connection_pattern: com.mapr.drill.jdbc42.Driver
-        driver: jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl
-        port: 1234
-        clusterName: unknown
+        hosts: localhost
+        connection_pattern: jdbc:drill:zk=%s/drill/%s-drillbits;auth=maprsasl
+        driver: com.mapr.drill.jdbc42.Driver
+        port: 31010
+        clusterName: local
   ojai:
     url: "ojai:mapr:"
+  rest:
+    url: "http://localhost:8444/rest/table/create"
