@@ -7,4 +7,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Repository {
     String tablePath() default "";
+    boolean createTableIfNotExists() default false;
 }

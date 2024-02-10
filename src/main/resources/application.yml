@@ -10,4 +10,4 @@ mapr:
   ojai:
     url: "ojai:mapr:"
   rest:
-    url: "http://localhost:8444/rest/table/create"
+    url: "http://localhost:8444"
