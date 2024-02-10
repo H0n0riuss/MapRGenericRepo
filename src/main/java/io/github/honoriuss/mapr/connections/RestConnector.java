@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.connections;
 
-import io.github.honoriuss.mapr.connections.models.TableFullModel;
+import io.github.honoriuss.mapr.connections.models.TableBaseModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class RestConnector {
         this.maprDbRestUrl = maprDbRestUrl;
     }
 
-    public boolean createTable(TableFullModel tableFullModel) {
+    public boolean createTable(TableBaseModel tableFullModel) {
         return createTable(tableFullModel.toJson());
     }
 
@@ -35,7 +35,7 @@ public class RestConnector {
      * @param jsonTableBodyString: this is sent to the maprDbRestUrl
      * @return true if no exception occurs
      */
-    public boolean createTable(String jsonTableBodyString) { //TODO name + column Model?
+    public boolean createTable(String jsonTableBodyString) {
         try {
             var url = new URL(maprDbRestUrl);
             var connection = (HttpURLConnection) url.openConnection();
