@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 import io.github.honoriuss.mapr.connections.OjaiConnector;
 import io.github.honoriuss.mapr.connections.interfaces.ITableCreator;
+import io.github.honoriuss.mapr.generator.annotations.CreateTable;
 import io.github.honoriuss.mapr.generator.annotations.Entity;
 import io.github.honoriuss.mapr.generator.annotations.Repository;
 import org.ojai.store.Connection;
@@ -109,16 +110,17 @@ public class MapRProcessor extends AbstractProcessor {
     }
 
     private void implementConstructor() {
-        Repository repositoryAnnotation = interfaceElement.getAnnotation(Repository.class);
-        if (repositoryAnnotation.createTableIfNotExists()) {
+        var repositoryAnnotation = interfaceElement.getAnnotation(CreateTable.class);
+        if (repositoryAnnotation != null) {
             classBuilder.addMethod(MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(OjaiConnector.class, "connection")
                     .addParameter(ITableCreator.class, "tableCreator")
                     .addStatement("this.connection = connection.getConnection()")
-                    .addStatement(createTableIfExistsString())
+                    .addStatement(ATableCreator.createTable(repositoryAnnotation.viaRest()))
                     .build());
             return;
+
         }
         classBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
@@ -154,9 +156,5 @@ public class MapRProcessor extends AbstractProcessor {
         } catch (Exception ex) {
             this.processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, ex.getMessage());
         }
-    }
-
-    private String createTableIfExistsString() {
-        return "";
     }
 }

@@ -5,6 +5,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 @Documented
-public @interface Repository {
-    String tablePath() default "";
+public @interface CreateTable {
+    boolean viaRest() default false;
 }

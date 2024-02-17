@@ -11,3 +11,7 @@ mapr:
     url: "ojai:mapr:"
   rest:
     url: "http://localhost:8444"
+  permissions:
+    owner: "owner"
+    group: "group"
+    other: "other"
