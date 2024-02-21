@@ -2,6 +2,7 @@ package io.github.honoriuss.mapr.connections;
 
 import io.github.honoriuss.mapr.connections.interfaces.ITableCreator;
 import io.github.honoriuss.mapr.connections.models.TableBaseModel;
+import io.github.honoriuss.mapr.utils.RestMapRUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class RestConnector implements ITableCreator {
 
     @Override
     public boolean createTable(TableBaseModel tableFullModel) {
-        return createTable(tableFullModel.toJson());
+        return RestMapRUtils.createTable(maprDbRestUrl, tableFullModel.toJson());
     }
 
     /**
@@ -40,57 +41,11 @@ public class RestConnector implements ITableCreator {
      */
     @Override
     public boolean createTable(String jsonTableBodyString) { //TODO authorization?
-        try {
-            var url = new URL(maprDbRestUrl + "/rest/table/create");
-            var connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            var outputStream = connection.getOutputStream();
-            outputStream.write(jsonTableBodyString.getBytes());
-            outputStream.flush();
-
-            var responseCode = connection.getResponseCode();
-            logger.info("Response Code: " + responseCode);
-
-            var in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            var response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            logger.info("Response Body: " + response);
-
-            connection.disconnect();
-            return true;
-        } catch (Exception e) {
-            logger.info(e.getMessage());
-        }
-        return false;
+        return RestMapRUtils.createTable(maprDbRestUrl, jsonTableBodyString);
     }
 
     @Override
     public boolean tableExists(String fullPath) {
-        try {
-            //var urlStr = maprDbRestUrl + "/rest/table/info?name=" + tableName; //TODO tablename or fullpath?
-            var urlStr = maprDbRestUrl + "/rest/table/info?name=" + fullPath;
-            var url = new URL(urlStr);
-
-            var conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-
-            var authString = "username" + ":" + "password"; //TODO other auths implement?
-            var encodedAuthString = Base64.getEncoder().encodeToString(authString.getBytes());
-            conn.setRequestProperty("Authorization", "Basic " + encodedAuthString);
-
-            var responseCode = conn.getResponseCode();
-            return responseCode == HttpURLConnection.HTTP_OK;
-        } catch (Exception e) {
-            logger.warning(e.getMessage());
-        }
-        return false;
+        return RestMapRUtils.tableExists(maprDbRestUrl, fullPath);
     }
 }

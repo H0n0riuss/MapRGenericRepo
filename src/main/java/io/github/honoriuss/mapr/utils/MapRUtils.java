@@ -57,4 +57,8 @@ public abstract class MapRUtils {
         }
         return false;
     }
+
+    public static boolean createTable(String tableName, boolean viaRest) {
+        return false;
+    }
 }
