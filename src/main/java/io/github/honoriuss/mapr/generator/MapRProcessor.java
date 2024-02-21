@@ -140,7 +140,7 @@ public class MapRProcessor extends AbstractProcessor {
     private void implementExtendsMethods() {
         for (var t : this.extendsInterfaces) {
             if (t.getKind() == TypeKind.DECLARED) {
-                Element element = ((DeclaredType) t).asElement(); //TODO hier weiter machen
+                Element element = ((DeclaredType) t).asElement();
                 for (var e : element.getEnclosedElements()) {
                     classBuilder.addMethod(AMethodGenerator.generateMethod((ExecutableElement) e, processingEnv, entityClassName, classAttributeList));
                 }

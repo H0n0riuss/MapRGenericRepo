@@ -1,11 +1,7 @@
 package io.github.honoriuss.mapr.fileSystem;
 
-import oadd.org.apache.hadoop.conf.Configuration;
-import oadd.org.apache.hadoop.fs.FileSystem;
-import oadd.org.apache.hadoop.fs.LocatedFileStatus;
-import oadd.org.apache.hadoop.fs.Path;
-import oadd.org.apache.hadoop.fs.RemoteIterator;
-import oadd.org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.*;
 
 import java.io.IOException;
 import java.io.InputStream;

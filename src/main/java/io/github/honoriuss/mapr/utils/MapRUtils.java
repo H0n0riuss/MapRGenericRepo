@@ -1,7 +1,8 @@
 package io.github.honoriuss.mapr.utils;
 
+import com.mapr.db.MapRDB;
 import io.github.honoriuss.mapr.fileSystem.MapRFSAdapter;
-import oadd.org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
 
@@ -19,17 +20,22 @@ public abstract class MapRUtils {
     public static boolean createDirectoryPath(String fullPath) throws IOException {
         var fs = MapRFSAdapter.getFs();
         var dirPath = new Path(fullPath);
-        if(fs.exists(dirPath))
+        if (fs.exists(dirPath))
             return true;
         return fs.mkdirs(dirPath);
     }
 
     /**
-     *
      * @param tableFullPath
      * @return
      */
-    public static boolean createTable(String tableFullPath) {
+    public static boolean createTable(String tableFullPath) throws IOException {
+        var lasIndexOf = tableFullPath.lastIndexOf("/");
+        var dir = tableFullPath.substring(0, lasIndexOf);
+        createDirectoryPath(dir);
+        if(!MapRDB.tableExists(tableFullPath)){ //TODO
+
+        }
         return false;
     }
 }
