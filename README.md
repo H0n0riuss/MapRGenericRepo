@@ -5,19 +5,21 @@ Spring-boot and Apache MapR.
 Like MongoDB driver and others.
 
 ```java
-package io.github.honoriuss.mapr.repositories.entities;
+import io.github.honoriuss.mapr.generator.annotations.Entity;
+import io.github.honoriuss.mapr.repositories.entities.AEntity;
 
+@Entity
 public class YourEntity extends AEntity {
     public String identifier;
 }
 ```
 
 ```java
-import io.github.honoriuss.mapr.query.annotations.Repository;
-import io.github.honoriuss.mapr.repositories.CRUDMapRRepository;
+import io.github.honoriuss.mapr.generator.annotations.Repository;
+import io.github.honoriuss.mapr.generator.interfaces.IMapRRepository;
 
-@Repository
-public interface YourRepository extends CRUDMapRRepository<YourEntity> {
+@Repository(tablePath = "your/path")
+public interface YourRepository extends IMapRRepository<YourEntity> {
     YourEntity[] findByIdentifier(String identifier);
 }
 ```
