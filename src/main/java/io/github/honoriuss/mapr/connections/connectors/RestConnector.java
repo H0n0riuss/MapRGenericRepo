@@ -1,4 +1,4 @@
-package io.github.honoriuss.mapr.connections;
+package io.github.honoriuss.mapr.connections.connectors;
 
 import io.github.honoriuss.mapr.connections.interfaces.ITableCreator;
 import io.github.honoriuss.mapr.connections.models.TableBaseModel;
@@ -6,11 +6,6 @@ import io.github.honoriuss.mapr.utils.RestMapRUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Base64;
 import java.util.logging.Logger;
 
 /**

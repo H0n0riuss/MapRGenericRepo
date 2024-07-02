@@ -2,7 +2,7 @@ package io.github.honoriuss.mapr.query;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
-import io.github.honoriuss.mapr.connections.OjaiConnector;
+import io.github.honoriuss.mapr.connections.interfaces.IOjaiConnector;
 import io.github.honoriuss.mapr.query.annotations.Repository;
 import io.github.honoriuss.mapr.query.models.MetaInformation;
 import io.github.honoriuss.mapr.query.models.Query;
@@ -89,7 +89,7 @@ public class MapRProcessor extends AbstractProcessor {
     private void implementConstructor() {
         classBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(OjaiConnector.class, "connection")
+                .addParameter(IOjaiConnector.class, "connection")
                 .addStatement("this.connection = connection.getConnection()")
                 .build());
     }

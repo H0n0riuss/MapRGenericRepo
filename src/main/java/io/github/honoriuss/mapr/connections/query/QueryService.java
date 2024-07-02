@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.connections.query;
 
-import io.github.honoriuss.mapr.connections.DrillConnector;
+import io.github.honoriuss.mapr.connections.connectors.DrillConnector;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

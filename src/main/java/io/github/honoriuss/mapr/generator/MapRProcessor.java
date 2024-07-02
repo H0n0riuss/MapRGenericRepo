@@ -2,7 +2,7 @@ package io.github.honoriuss.mapr.generator;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
-import io.github.honoriuss.mapr.connections.OjaiConnector;
+import io.github.honoriuss.mapr.connections.interfaces.IOjaiConnector;
 import io.github.honoriuss.mapr.connections.interfaces.ITableCreator;
 import io.github.honoriuss.mapr.generator.annotations.CreateTable;
 import io.github.honoriuss.mapr.generator.annotations.Entity;
@@ -114,7 +114,7 @@ public class MapRProcessor extends AbstractProcessor {
         if (repositoryAnnotation != null) {
             classBuilder.addMethod(MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(OjaiConnector.class, "connection")
+                    .addParameter(IOjaiConnector.class, "connection")
                     .addParameter(ITableCreator.class, "tableCreator")
                     .addStatement("this.connection = connection.getConnection()")
                     .addStatement(ATableCreator.createTable(repositoryAnnotation.viaRest()))
@@ -124,7 +124,7 @@ public class MapRProcessor extends AbstractProcessor {
         }
         classBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(OjaiConnector.class, "connection")
+                .addParameter(IOjaiConnector.class, "connection")
                 .addStatement("this.connection = connection.getConnection()")
                 .build());
     }

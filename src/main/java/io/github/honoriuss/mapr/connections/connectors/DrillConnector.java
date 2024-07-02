@@ -1,4 +1,4 @@
-package io.github.honoriuss.mapr.connections;
+package io.github.honoriuss.mapr.connections.connectors;
 
 import io.github.honoriuss.mapr.connections.config.MapRConfig;
 import io.github.honoriuss.mapr.connections.query.DrillResult;
