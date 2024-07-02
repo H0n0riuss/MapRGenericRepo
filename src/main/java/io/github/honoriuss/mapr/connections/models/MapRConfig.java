@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public abstract class MapRConfig {
+public abstract class MapRConfig { //TODO refactor to config files and factory pattern
     @Value("${mapr.drill.connection.jdbc.hosts:localhost}")
     private String[] hosts;
     @Value("${mapr.drill.connection.jdbc.clusterName:local}")

@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class DrillConnector {
+public class DrillConnector { //TODO build beans with factory
     private final MapRConfig mapRConfig;
     private Connection connection;
     private String drillUrl;
