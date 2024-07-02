@@ -15,8 +15,9 @@ import java.util.logging.Logger;
 public abstract class RestMapRUtils {
     private static final Logger logger = Logger.getLogger(RestMapRUtils.class.getSimpleName());
 
-    public static boolean createTable(String maprDbRestUrl, TableBaseModel tableFullModel) {
-        return createTable(maprDbRestUrl, tableFullModel.toJson());
+    public static boolean createTable(String maprDbRestUrl, String port, TableBaseModel tableFullModel, String username, String password) {
+        //return createTable(maprDbRestUrl, port, tableFullModel.toJson(), username, password);
+        return false;
     }
 
     /**
@@ -26,32 +27,42 @@ public abstract class RestMapRUtils {
      * @param jsonTableBodyString: this is sent to the maprDbRestUrl
      * @return true if no exception occurs
      */
-    public static boolean createTable(String maprDbRestUrl, String jsonTableBodyString) { //TODO authorization?
+    public static boolean createTable(String maprDbRestUrl, String port, String api, String jsonTableBodyString, String username, String password) { //TODO authorization?
         try {
-            var url = new URL(maprDbRestUrl + "/rest/table/create");
-            var connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
+            var url = maprDbRestUrl + ":" + port + api;
 
-            var outputStream = connection.getOutputStream();
-            outputStream.write(jsonTableBodyString.getBytes());
-            outputStream.flush();
+            try {
+                URL obj = new URL(url);
+                HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-            var responseCode = connection.getResponseCode();
-            logger.info("Response Code: " + responseCode);
+                // Setzen von Request-Methode und Basic-Authentifizierung
+                con.setRequestMethod("PUT");
+                String auth = username + ":" + password;
+                byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+                String authHeaderValue = "Basic " + new String(encodedAuth);
+                con.setRequestProperty("Authorization", authHeaderValue);
 
-            var in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            var response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                int responseCode = con.getResponseCode();
+                logger.info("Response code: " + responseCode);
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                // Drucken der Antwort
+                logger.info("Response body: " + response);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            in.close();
 
-            logger.info("Response Body: " + response);
 
-            connection.disconnect();
+            logger.info("Response Body: " );
+
             return true;
         } catch (Exception e) {
             logger.warning(e.getMessage());

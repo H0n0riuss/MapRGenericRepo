@@ -34,7 +34,7 @@
 
         <scala.version>2.13.13</scala.version>
         <scala-maven.version>4.8.1</scala-maven.version>
-        <mapr-ojai.version>7.2.0.3-mapr</mapr-ojai.version>
+        <mapr.version>7.2.0.3-mapr</mapr.version>
     </properties>
 
     <licenses>
@@ -81,8 +81,34 @@
         <dependency>
             <groupId>com.mapr.ojai</groupId>
             <artifactId>mapr-ojai-driver</artifactId>
-            <version>${mapr-ojai.version}</version>
+            <version>${mapr.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.mapr.hadoop</groupId>
+            <artifactId>maprfs</artifactId>
+            <version>${mapr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_2.12</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mapr.db</groupId>
+            <artifactId>maprdb-spark</artifactId>
+            <version>6.0.0-mapr</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mapr.db</groupId>
+            <artifactId>maprdb</artifactId>
+            <version>7.2.0.0-mapr</version> <!-- Die Version entsprechend deiner MapR-Cluster-Version -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>3.2.0</version> <!-- Die Version entsprechend deiner Hadoop-Version -->
+        </dependency>
+
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>

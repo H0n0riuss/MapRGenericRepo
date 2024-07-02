@@ -20,8 +20,12 @@ import java.util.logging.Logger;
 public class RestConnector implements ITableCreator {
     private final Logger logger = Logger.getLogger(RestConnector.class.getSimpleName());
 
-    @Value("${mapr.rest.url:http://localhost:8444}")
+    @Value("${mapr.rest.baseUrl:https://localhost:}")
     private String maprDbRestUrl;
+    @Value("${mapr.rest.port:8243}")
+    private String port;
+    @Value("${mapr.rest.api:/api/v2/table/}")
+    private String api;
 
     public void setMaprDbRestUrl(String maprDbRestUrl) {
         this.maprDbRestUrl = maprDbRestUrl;
@@ -29,7 +33,8 @@ public class RestConnector implements ITableCreator {
 
     @Override
     public boolean createTable(TableBaseModel tableFullModel) {
-        return RestMapRUtils.createTable(maprDbRestUrl, tableFullModel.toJson());
+        //return RestMapRUtils.createTable(maprDbRestUrl, port, api, tableFullModel.toJson());
+        return false;
     }
 
     /**

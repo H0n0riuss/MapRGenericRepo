@@ -10,7 +10,9 @@ mapr:
   ojai:
     url: "ojai:mapr:"
   rest:
-    url: "http://localhost:8444"
+    baseUrl: "https://localhost:"
+    port: "8243"
+    api: "/api/v2/table/"
   permissions:
     owner: "owner"
     group: "group"
