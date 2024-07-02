@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OjaiConnector {
-    private String url;
+    private String url = "ojai:mapr:";
     private Connection connection;
 
     public Connection getConnection() {
