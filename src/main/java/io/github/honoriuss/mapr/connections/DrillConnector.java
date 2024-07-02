@@ -1,6 +1,6 @@
 package io.github.honoriuss.mapr.connections;
 
-import io.github.honoriuss.mapr.connections.models.MapRConfig;
+import io.github.honoriuss.mapr.connections.config.MapRConfig;
 import io.github.honoriuss.mapr.connections.query.DrillResult;
 import io.github.honoriuss.mapr.utils.StringUtils;
 import org.springframework.stereotype.Service;
