@@ -5,6 +5,7 @@ import io.github.honoriuss.mapr.connections.interfaces.IOjaiConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class MapRGenericConfiguration {
     private final Logger logger = LoggerFactory.getLogger(MapRGenericConfiguration.class);
 
+    @Bean
     @ConditionalOnMissingBean(IOjaiConnector.class)
     public IOjaiConnector getOjaiConnector() {
         var connector = MapRGenericFactory.getOjaiConnector();
